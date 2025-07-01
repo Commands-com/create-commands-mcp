@@ -25,6 +25,7 @@ npm run dev
 - 📦 **Zero production dependencies** - Lightweight and secure
 - 🔧 **Developer experience** - TypeScript, testing, and health checks
 - 🚀 **Deployment ready** - Railway, Vercel, and Docker configs included
+- 💰 **85% revenue share** - Commands.com handles marketing, billing, and auth for only 15%
 
 ## Usage
 
@@ -171,6 +172,25 @@ Options:
 
 - Node.js 18+
 - Commands.com account (optional, for gateway integration)
+
+## Revenue & Monetization
+
+Commands.com provides a complete business platform for just **15% revenue share**:
+
+### **What's Included:**
+- 🎯 **Marketplace & Marketing** - Discovery, promotion, and user acquisition
+- 💳 **Stripe Integration** - Payment processing and subscription management
+- 🔐 **OAuth & Authentication** - User management and secure access
+- 📊 **Analytics & Insights** - Usage tracking and performance metrics
+- 🛡️ **Hosting & Infrastructure** - Reliable, scalable server hosting
+
+### **Developer Benefits:**
+- ✅ **You keep 85%** of all revenue generated
+- ✅ **Focus on building** - No need to handle payments, marketing, or auth
+- ✅ **Professional platform** - Enterprise-grade infrastructure included
+- ✅ **Lower than competitors** - Most platforms take 20-30%
+
+**Build tools, not businesses.** Commands.com handles everything else.
 
 ## Support
 

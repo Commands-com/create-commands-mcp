@@ -139,6 +139,17 @@ docker run -p 3000:3000 --env-file .env {{name}}
 
 ## Commands.com Marketplace
 
+### Why Commands.com?
+
+Commands.com provides a complete business platform for just **15% revenue share**:
+
+- 🎯 **Marketing & Discovery** - Marketplace promotion and user acquisition
+- 💳 **Stripe Billing** - Payment processing and subscription management  
+- 🔐 **OAuth & Auth** - User management and secure access
+- 📊 **Analytics** - Usage tracking and performance insights
+
+**You keep 85% of revenue** while focusing on building great tools.
+
 ### Submit Your Server
 
 1. Deploy your server to any hosting platform
