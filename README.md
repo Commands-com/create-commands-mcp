@@ -40,7 +40,11 @@ npx create-commands-mcp my-server-name
 
 ### With Options
 ```bash
-npx create-commands-mcp my-server --template=api --lang=typescript
+# API template with Railway deployment config
+npx create-commands-mcp my-server --template=api --deploy=railway
+
+# Basic template with Docker setup
+npx create-commands-mcp my-server --template=basic --deploy=docker
 ```
 
 ## Templates
@@ -134,20 +138,22 @@ export const myTool = {
 
 ## Deployment Options
 
-### Railway (Recommended)
-- One-click deployment
-- Automatic HTTPS
-- Built-in monitoring
+Use `--deploy <platform>` to include deployment configuration files:
 
-### Vercel
-- Serverless deployment  
-- Edge functions
-- Global CDN
+### Railway (`--deploy=railway`)
+- Includes `railway.json` config
+- One-click deployment via GitHub
+- Automatic HTTPS and monitoring
 
-### Docker
-- Self-hosted
-- Full control
-- Custom infrastructure
+### Vercel (`--deploy=vercel`)
+- Includes `vercel.json` config
+- Serverless deployment via GitHub
+- Edge functions and global CDN
+
+### Docker (`--deploy=docker`)
+- Includes `Dockerfile` and `docker-compose.yml`
+- Self-hosted deployment
+- Full control over infrastructure
 
 ## CLI Options
 
@@ -157,7 +163,7 @@ npx create-commands-mcp [name] [options]
 Options:
   -t, --template <type>    Template type (basic|api|data)
   -l, --lang <language>    Language (typescript|javascript)  
-  -d, --deploy <platform>  Include deployment config
+  -d, --deploy <platform>  Deployment config (railway|vercel|docker)
   -h, --help              Show help
 ```
 

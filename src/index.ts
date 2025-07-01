@@ -55,12 +55,12 @@ async function main() {
   console.log(chalk.blue.bold('🚀 Create Commands MCP Server\n'));
 
   program
-    .version('1.0.0')
+    .version('1.0.5')
     .description('Create a new MCP server for Commands.com')
     .argument('[name]', 'Project name')
-    .option('-t, --template <type>', 'Template type', 'basic')
-    .option('-l, --lang <language>', 'Language', 'typescript')
-    .option('-d, --deploy <platform>', 'Deployment platform')
+    .option('-t, --template <type>', 'Template type (basic|api|data)', 'basic')
+    .option('-l, --lang <language>', 'Language (typescript|javascript)', 'typescript')
+    .option('-d, --deploy <platform>', 'Deployment platform (railway|vercel|docker)')
     .option('--author <name>', 'Author name')
     .option('--description <desc>', 'Project description')
     .parse();
