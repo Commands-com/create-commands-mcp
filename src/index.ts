@@ -71,7 +71,7 @@ async function main() {
   let projectName = args[0];
   let config: ProjectConfig;
 
-  if (!projectName || !options.template) {
+  if (!projectName) {
     // Interactive mode
     config = await promptForConfig(projectName);
   } else {
