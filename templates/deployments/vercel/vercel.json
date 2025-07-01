@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "name": "{{name}}",
+  "builds": [
+    {
+      "src": "dist/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/dist/index.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "COMMANDS_JWT_ISSUER": "@commands_jwt_issuer",
+    "COMMANDS_JWT_AUDIENCE": "@commands_jwt_audience",
+    "COMMANDS_API_URL": "https://api.commands.com"
+  },
+  "functions": {
+    "dist/index.js": {
+      "maxDuration": 30
+    }
+  }
+}

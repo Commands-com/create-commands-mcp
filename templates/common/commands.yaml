@@ -1,0 +1,52 @@
+# Commands.com MCP Server Configuration
+# This file defines your server for the Commands.com marketplace
+
+name: {{name}}
+description: {{description}}
+version: 1.0.0
+
+# Author information
+author:
+  name: {{author_name}}
+  email: {{author_email}}
+
+# Server configuration
+mcp:
+  server_url: "https://your-server.railway.app"  # Update with your deployed URL
+  authentication: "commands_gateway"
+  health_check: "/health"
+
+# Available tools (auto-generated from your implementation)
+tools:
+  - name: ping
+    description: "Test server connectivity and responsiveness"
+    category: "utility"
+  
+  - name: echo
+    description: "Echo back user input for testing"
+    category: "utility"
+    
+  - name: datetime
+    description: "Get current date and time in various formats"
+    category: "utility"
+
+# Marketplace information
+categories: ["utility", "development"]
+tags: ["mcp", "development", "testing"]
+pricing: "free"
+
+# Optional: Advanced configuration
+rate_limits:
+  requests_per_minute: 60
+  requests_per_hour: 1000
+
+# Optional: Required scopes from Commands.com
+scopes:
+  - read_assets   # For accessing user's Commands.com assets
+  # - write_assets  # For modifying user's assets (uncomment if needed)
+
+# Optional: Deployment information
+deployment:
+  type: "http_server"
+  health_check_path: "/health"
+  timeout_seconds: 30
