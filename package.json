@@ -1,6 +1,6 @@
 {
   "name": "create-commands-mcp",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "description": "Scaffolding tool for creating MCP servers that connect to Commands.com",
   "main": "dist/index.js",
