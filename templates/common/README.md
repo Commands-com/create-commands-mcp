@@ -10,9 +10,9 @@ Created with [create-commands-mcp](https://www.npmjs.com/package/create-commands
 # Install dependencies
 npm install
 
-# Configure environment
+# Configure environment (optional)
 cp .env.example .env
-# Edit .env with your Commands.com credentials
+# Customize settings if needed - works out of the box!
 
 # Start development server
 npm run dev
