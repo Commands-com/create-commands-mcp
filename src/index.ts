@@ -269,9 +269,17 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
   }
 }
 
+// Debug execution context
+console.log('DEBUG: import.meta.url:', import.meta.url);
+console.log('DEBUG: process.argv[1]:', process.argv[1]);
+console.log('DEBUG: process.argv:', process.argv);
+
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}` || process.argv[1].endsWith('create-commands-mcp')) {
+  console.log('DEBUG: Executing main function');
   main().catch(console.error);
+} else {
+  console.log('DEBUG: Not executing - conditions not met');
 }
 
 export { main };
