@@ -31,33 +31,62 @@ curl http://localhost:3000/health
 
 ### Adding New Tools
 
-1. Create a new file in `src/tools/`:
+### Quick Start
+
+1. **Create a new tool file** in `src/tools/`:
 
 ```typescript
 // src/tools/myTool.ts
 export const myTool = {
   name: "my_tool",
-  description: "Does something useful",
+  description: "Does something useful - be specific for better AI usage",
   inputSchema: {
     type: "object",
     properties: {
-      input: { type: "string", description: "User input" }
+      input: { 
+        type: "string", 
+        description: "Clear description helps AI understand when to use this tool" 
+      }
     },
     required: ["input"]
   },
   handler: async (args: { input: string }) => {
-    return { result: `Processed: ${args.input}` };
+    // Your tool logic here
+    return { 
+      success: true,
+      result: `Processed: ${args.input}`,
+      // Return structured data when possible
+    };
   }
 };
 ```
 
-2. Export it from `src/tools/index.ts`:
+2. **Export from** `src/tools/index.ts`:
 
 ```typescript
 export { myTool } from './myTool';
 ```
 
-3. The tool will be automatically available via the MCP protocol.
+3. **Test your tool**:
+```bash
+npm run dev  # Start server
+npm run doctor  # Verify tool registration
+```
+
+### Tool Design Best Practices
+
+- 📝 **Clear descriptions** - AI needs to understand when to use your tool
+- 🔧 **Specific input schemas** - Define exactly what parameters you need
+- ✅ **Error handling** - Return meaningful error messages
+- 📊 **Structured output** - Consistent response format helps AI usage
+- 🚀 **Performance** - Keep tools fast (< 30s timeout recommended)
+
+### Documentation & Examples
+
+- 📖 **[MCP Tool Guidelines](https://commands.com/docs/mcp/tools/)** - Comprehensive tool development guide
+- 🎯 **[Tool Design Patterns](https://commands.com/docs/mcp/patterns/)** - Common patterns and examples
+- 🔍 **[Schema Reference](https://commands.com/docs/mcp/schemas/)** - Input/output schema documentation
+- 💡 **[Community Examples](https://commands.com/examples/)** - Real-world tool implementations
 
 ### Testing
 
