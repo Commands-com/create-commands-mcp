@@ -153,7 +153,6 @@ function validateRequired(config: CommandsConfig, errors: ValidationError[]) {
     { path: 'version', type: 'string' },
     { path: 'author.name', type: 'string' },
     { path: 'author.email', type: 'string' },
-    { path: 'mcp.server_url', type: 'string' },
     { path: 'mcp.authentication', type: 'string' },
     { path: 'tools', type: 'array' },
     { path: 'categories', type: 'array' }
@@ -282,11 +281,12 @@ function validateTools(config: CommandsConfig, errors: ValidationError[]) {
 }
 
 function validateDeployment(config: CommandsConfig, errors: ValidationError[]) {
-  if (config.mcp?.server_url?.includes('localhost') || config.mcp?.server_url?.includes('127.0.0.1')) {
+  // Check if deployment configuration exists
+  if (!config.deployment) {
     errors.push({
-      field: 'mcp.server_url',
-      message: 'Server URL points to localhost - update with your deployed URL',
-      severity: 'error'
+      field: 'deployment',
+      message: 'Consider adding deployment configuration for production readiness',
+      severity: 'warning'
     });
   }
 
