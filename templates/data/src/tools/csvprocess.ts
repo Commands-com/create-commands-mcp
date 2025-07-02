@@ -272,7 +272,7 @@ function analyzeDataTypes(rows: string[][], headers: string[]): Record<string, a
     });
     
     const dominantType = Object.entries(types).reduce((a, b) => 
-      types[a[0]] > types[b[0]] ? a : b
+      (types as any)[a[0]] > (types as any)[b[0]] ? a : b
     )[0];
     
     analysis[header] = {

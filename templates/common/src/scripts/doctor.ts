@@ -226,7 +226,7 @@ async function checkCommandsConnectivity() {
     });
 
     if (response.ok) {
-      const jwks = await response.json();
+      const jwks: any = await response.json();
       if (jwks.keys && Array.isArray(jwks.keys)) {
         checks.push({
           name: 'Commands.com Connectivity',

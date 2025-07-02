@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+// @ts-ignore - jwks-client doesn't have type definitions
 import jwksClient from 'jwks-client';
 import { TokenClaims, MCPError } from '../types';
 
@@ -88,7 +89,7 @@ export async function verifyToken(token: string): Promise<TokenClaims> {
     }
 
     // JWKS errors
-    if (error.name === 'JwksError') {
+    if (error instanceof Error && error.name === 'JwksError') {
       throw new MCPError('UNAUTHORIZED', `Key verification failed: ${error.message}`);
     }
 

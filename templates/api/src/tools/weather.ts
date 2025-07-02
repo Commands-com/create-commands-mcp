@@ -93,7 +93,7 @@ export const weatherTool: Tool = {
         throw new Error(`Weather API returned status ${response.status}`);
       }
       
-      const weatherData = await response.json();
+      const weatherData: any = await response.json();
       
       const result: any = {
         location: {
@@ -137,7 +137,7 @@ export const weatherTool: Tool = {
           });
           
           if (forecastResponse.ok) {
-            const forecastData = await forecastResponse.json();
+            const forecastData: any = await forecastResponse.json();
             result.forecast = forecastData.list.map((item: any) => ({
               datetime: item.dt_txt,
               temperature: Math.round(item.main.temp),

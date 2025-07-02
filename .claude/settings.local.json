@@ -12,7 +12,8 @@
       "Bash(npm install:*)",
       "Bash(npx create-commands-mcp:*)",
       "Bash(create-commands-mcp:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(cp:*)"
     ],
     "deny": []
   }

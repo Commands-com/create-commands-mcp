@@ -47,7 +47,7 @@ export const catFactTool: Tool = {
         throw new Error(`API responded with status ${response.status}`);
       }
       
-      const data = await response.json();
+      const data: any = await response.json();
       
       if (!data.fact) {
         throw new Error('Invalid response format from API');
