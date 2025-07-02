@@ -6,10 +6,15 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
 // Fix for CommonJS modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Get version from package.json
+const require = createRequire(import.meta.url);
+const { version } = require('../package.json');
 
 const program = new Command();
 
@@ -55,7 +60,7 @@ async function main() {
   console.log(chalk.blue.bold('🚀 Create Commands MCP Server\n'));
 
   program
-    .version('1.0.5')
+    .version(version)
     .description('Create a new MCP server for Commands.com')
     .argument('[name]', 'Project name')
     .option('-t, --template <type>', 'Template type (basic|api|data)', 'basic')
@@ -63,7 +68,6 @@ async function main() {
     .option('-d, --deploy <platform>', 'Deployment platform (railway|vercel|docker)')
     .option('--author <name>', 'Author name')
     .option('--description <desc>', 'Project description')
-    .option('--no-telemetry', 'Disable anonymous usage analytics')
     .parse();
 
   const options = program.opts<CreateOptions>();
