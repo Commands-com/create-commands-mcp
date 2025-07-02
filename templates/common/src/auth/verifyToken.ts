@@ -7,7 +7,7 @@ import { TokenClaims, MCPError } from '../types';
 const client = jwksClient({
   jwksUri: process.env.COMMANDS_JWKS_URL || 'https://api.commands.com/.well-known/jwks.json',
   cache: true,
-  cacheMaxAge: 300000, // 5 minutes
+  cacheMaxAge: '10m', // 10 minutes
   rateLimit: true,
   jwksRequestsPerMinute: 5
 });
