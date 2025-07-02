@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { echoTool } from '../src/tools/echo';
-import { MCPError } from '../src/types';
+import { echoTool } from '../src/tools/echo.js';
+import { MCPError } from '../src/types.js';
 
 describe('Echo Tool', () => {
   it('should echo back the message', async () => {

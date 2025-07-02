@@ -1,7 +1,7 @@
-import { Tool } from '../types';
-import { pingTool } from './ping';
-import { echoTool } from './echo';
-import { datetimeTool } from './datetime';
+import { Tool } from '../types.js';
+import { pingTool } from './ping.js';
+import { echoTool } from './echo.js';
+import { datetimeTool } from './datetime.js';
 
 // Export all tools - add new tools here
 export const tools: Tool[] = [
@@ -11,6 +11,6 @@ export const tools: Tool[] = [
 ];
 
 // Individual exports for direct usage
-export { pingTool } from './ping';
-export { echoTool } from './echo';
-export { datetimeTool } from './datetime';
+export { pingTool } from './ping.js';
+export { echoTool } from './echo.js';
+export { datetimeTool } from './datetime.js';

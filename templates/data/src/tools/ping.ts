@@ -1,4 +1,4 @@
-import { Tool } from '../types';
+import { Tool } from '../types.js';
 
 /**
  * Ping Tool - Test server connectivity and responsiveness

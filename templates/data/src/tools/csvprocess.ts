@@ -1,4 +1,4 @@
-import { Tool, MCPError } from '../types';
+import { Tool, MCPError } from '../types.js';
 
 /**
  * CSV Process Tool - Demonstrates text processing and data transformation

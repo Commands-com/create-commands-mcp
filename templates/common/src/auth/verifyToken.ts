@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 // @ts-ignore - jwks-client doesn't have type definitions
 import jwksClient from 'jwks-client';
-import { TokenClaims, MCPError } from '../types';
+import { TokenClaims, MCPError } from '../types.js';
 
 // JWKS client for Commands.com public keys
 const client = jwksClient({

@@ -1,4 +1,4 @@
-import { Tool, MCPError } from '../types';
+import { Tool, MCPError } from '../types.js';
 
 /**
  * Cat Fact Tool - Demonstrates external API integration with offline fallback

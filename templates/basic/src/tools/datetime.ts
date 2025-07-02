@@ -1,4 +1,4 @@
-import { Tool, MCPError } from '../types';
+import { Tool, MCPError } from '../types.js';
 
 /**
  * DateTime Tool - Get current date and time in various formats

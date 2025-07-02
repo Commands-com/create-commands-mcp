@@ -1,8 +1,8 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { parse } from 'url';
-import { verifyToken } from './auth/verifyToken';
-import { tools } from './tools';
-import { MCPRequest, MCPResponse, MCPError, Tool, MCPServerInfo, TokenClaims } from './types';
+import { verifyToken } from './auth/verifyToken.js';
+import { tools } from './tools/index.js';
+import { MCPRequest, MCPResponse, MCPError, Tool, MCPServerInfo, TokenClaims } from './types.js';
 
 const PORT = parseInt(process.env.PORT || '3000');
 const isDevelopment = process.env.NODE_ENV === 'development';

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { csvprocessTool } from '../src/tools/csvprocess';
+import { csvprocessTool } from '../src/tools/csvprocess.js';
 
 describe('CSV Processing Tool', () => {
   it('should calculate average salary from sample CSV data', async () => {

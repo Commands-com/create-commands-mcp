@@ -1,4 +1,4 @@
-import { Tool, MCPError } from '../types';
+import { Tool, MCPError } from '../types.js';
 
 /**
  * JSON Parse Tool - Demonstrates data validation and transformation

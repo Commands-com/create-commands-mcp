@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pingTool } from '../src/tools/ping';
+import { pingTool } from '../src/tools/ping.js';
 
 describe('Ping Tool', () => {
   it('should return pong with timestamp', async () => {

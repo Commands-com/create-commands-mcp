@@ -12,7 +12,7 @@
 import { createConnection } from 'net';
 import fs from 'fs/promises';
 import path from 'path';
-import { verifyToken } from '../auth/verifyToken';
+import { verifyToken } from '../auth/verifyToken.js';
 
 interface HealthCheck {
   name: string;

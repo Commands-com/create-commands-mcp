@@ -1,4 +1,4 @@
-import { Tool, MCPError } from '../types';
+import { Tool, MCPError } from '../types.js';
 
 /**
  * Weather Tool - Demonstrates API integration requiring API keys
