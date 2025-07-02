@@ -36,7 +36,7 @@ export interface Tool {
     properties: Record<string, any>;
     required?: string[];
   };
-  handler: (args: any, user?: TokenClaims) => Promise<any>;
+  handler: (args: any) => Promise<any>;
 }
 
 // JWT Types
@@ -77,6 +77,5 @@ export const MCP_ERROR_CODES = {
 
 // Utility type for tool handlers
 export type ToolHandler<T = any, R = any> = (
-  args: T,
-  user?: TokenClaims
+  args: T
 ) => Promise<R>;
