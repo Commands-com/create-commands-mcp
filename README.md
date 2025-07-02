@@ -100,13 +100,16 @@ npm run doctor  # Health checks
 ### Gateway Integration (Optional)
 For Commands.com marketplace and routing:
 
-1. **Deploy**: Deploy to Railway/Vercel/Docker
-2. **Register**: Submit at [Commands.com Creator Portal](https://commands.com/creator/mcp-servers/new)
-3. **List**: Your server appears in Commands.com marketplace
+1. **Deploy**: Host your server anywhere (Railway/Vercel/AWS/etc.)
+2. **Register**: Submit your server URL at [Commands.com Creator Portal](https://commands.com/creator/mcp-servers/new)
+3. **Route**: Commands.com gateway routes user requests to your server
 
 ```bash
-npm run deploy          # Deploy to hosting platform
-# Then register your deployed URL at commands.com/creator/mcp-servers/new
+# Deploy to your preferred platform
+npm run build && npm start  # or deploy to Railway/Vercel/etc.
+
+# Register your live server URL at Commands.com
+# Example: https://my-server.railway.app
 ```
 
 ## Quick Deploy to Railway
@@ -205,12 +208,12 @@ Commands.com provides a complete business platform for just **15% revenue share*
 - 💳 **Stripe Integration** - Payment processing and subscription management
 - 🔐 **OAuth & Authentication** - User management and secure access
 - 📊 **Analytics & Insights** - Usage tracking and performance metrics
-- 🛡️ **Hosting & Infrastructure** - Reliable, scalable server hosting
+- 🌐 **Gateway & Routing** - Connects users to your self-hosted servers
 
 ### **Developer Benefits:**
 - ✅ **You keep 85%** of all revenue generated
 - ✅ **Focus on building** - No need to handle payments, marketing, or auth
-- ✅ **Professional platform** - Enterprise-grade infrastructure included
+- ✅ **Own your infrastructure** - Deploy anywhere (Railway, Vercel, AWS, etc.)
 - ✅ **Lower than competitors** - Most platforms take 20-30%
 
 **Build tools, not businesses.** Commands.com handles everything else.

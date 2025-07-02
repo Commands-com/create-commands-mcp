@@ -100,10 +100,10 @@ curl -H "Authorization: Bearer JWT_TOKEN" http://localhost:3000/ping
 
 To list your server on Commands.com and receive gateway traffic:
 
-1. Deploy your server to any hosting platform
-2. Register at [Commands.com Creator Portal](https://commands.com/creator/mcp-servers/new)
-3. Submit your server URL for marketplace listing
-4. Commands.com routes user requests to your server
+1. Deploy your server to any hosting platform (Railway, Vercel, AWS, etc.)
+2. Register your live server URL at [Commands.com Creator Portal](https://commands.com/creator/mcp-servers/new)
+3. Commands.com gateway routes user requests to your self-hosted server
+4. You handle all server hosting and scaling
 
 ```bash
 # Update .env with your deployed URL (optional)
@@ -165,8 +165,9 @@ Commands.com provides a complete business platform for just **15% revenue share*
 - 💳 **Stripe Billing** - Payment processing and subscription management  
 - 🔐 **OAuth & Auth** - User management and secure access
 - 📊 **Analytics** - Usage tracking and performance insights
+- 🌐 **Gateway Routing** - Routes users to your self-hosted server
 
-**You keep 85% of revenue** while focusing on building great tools.
+**You keep 85% of revenue** while hosting your own infrastructure.
 
 ### Submit Your Server
 
