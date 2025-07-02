@@ -115,11 +115,29 @@ npm run doctor
 
 ## Deployment
 
-### Railway (Recommended)
+### Railway (Recommended for Testing)
 
-1. Connect your repository to Railway
-2. Set environment variables in Railway dashboard
-3. Deploy automatically on git push
+**Quick Deploy in 2 minutes:**
+
+1. **Push to GitHub:**
+   ```bash
+   git init && git add . && git commit -m "Initial commit"
+   git remote add origin https://github.com/yourusername/{{name}}.git
+   git push -u origin main
+   ```
+
+2. **Connect to Railway:**
+   - Visit [railway.app](https://railway.app)
+   - Connect your GitHub repository
+   - Railway auto-detects and deploys instantly
+
+3. **Get live URL:**
+   - Your server: `https://{{name}}-production.up.railway.app`
+   - Test health: `curl https://{{name}}-production.up.railway.app/health`
+
+**Environment variables** (optional):
+- Set in Railway dashboard if needed
+- Server works out-of-the-box with defaults
 
 ### Vercel
 

@@ -109,12 +109,34 @@ npm run deploy          # Deploy to hosting platform
 # Then register your deployed URL at commands.com/creator/mcp-servers/new
 ```
 
+## Quick Deploy to Railway
+
+Test your MCP server in production in under 2 minutes:
+
+```bash
+# 1. Create with Railway config
+npx create-commands-mcp my-server --deploy=railway
+
+# 2. Initialize git and push to GitHub
+cd my-server
+git init && git add . && git commit -m "Initial MCP server"
+git remote add origin https://github.com/yourusername/my-server.git
+git push -u origin main
+
+# 3. Deploy to Railway
+# - Visit railway.app and connect your GitHub repo
+# - Railway auto-detects Node.js and deploys instantly
+# - Get live URL: https://my-server-production.up.railway.app
+```
+
+**Result:** Your MCP server is live and ready for Commands.com submission!
+
 ## Development Workflow
 
 1. **Create**: `npx create-commands-mcp my-server`
 2. **Develop**: Add tools in `src/tools/`
 3. **Test**: `npm run test` and `npm run doctor`
-4. **Deploy**: Choose Railway, Vercel, or Docker
+4. **Deploy**: Use Railway for instant testing
 5. **Publish**: Submit to Commands.com marketplace
 
 ## Adding Custom Tools
@@ -141,10 +163,11 @@ export const myTool = {
 
 Use `--deploy <platform>` to include deployment configuration files:
 
-### Railway (`--deploy=railway`)
+### Railway (`--deploy=railway`) - **Recommended for Testing**
 - Includes `railway.json` config
 - One-click deployment via GitHub
 - Automatic HTTPS and monitoring
+- Free $5/month credit perfect for testing
 
 ### Vercel (`--deploy=vercel`)
 - Includes `vercel.json` config
