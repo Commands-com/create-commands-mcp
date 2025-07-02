@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 // Quick test script to validate our template structure
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 function checkFileExists(filePath) {
   try {

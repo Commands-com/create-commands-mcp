@@ -1,0 +1,21 @@
+{
+  "name": "{{name}}",
+  "description": "{{description}}",
+  "version": "1.0.0",
+  "author": "{{author_name}}",
+  "homepage": "https://github.com/{{author_name}}/{{name}}",
+  "health_check": {
+    "endpoint": "/health",
+    "timeout": 5000
+  },
+  "tools": [
+    {
+      "name": "ping",
+      "description": "Test server connectivity"
+    },
+    {
+      "name": "echo",
+      "description": "Echo back the provided message"
+    }
+  ]
+}

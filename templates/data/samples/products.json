@@ -1,0 +1,45 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Laptop Pro 15",
+      "category": "Electronics",
+      "price": 1299.99,
+      "in_stock": true,
+      "specs": {
+        "cpu": "Intel i7",
+        "ram": "16GB",
+        "storage": "512GB SSD"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Wireless Headphones",
+      "category": "Audio",
+      "price": 199.99,
+      "in_stock": false,
+      "specs": {
+        "battery_life": "30 hours",
+        "noise_cancelling": true,
+        "color": "Black"
+      }
+    },
+    {
+      "id": 3,
+      "name": "Smart Watch",
+      "category": "Wearables",
+      "price": 349.99,
+      "in_stock": true,
+      "specs": {
+        "battery_life": "7 days",
+        "water_resistant": true,
+        "color": "Silver"
+      }
+    }
+  ],
+  "metadata": {
+    "total_products": 3,
+    "last_updated": "2025-07-02T00:00:00Z",
+    "currency": "USD"
+  }
+}

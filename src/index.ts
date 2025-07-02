@@ -63,6 +63,7 @@ async function main() {
     .option('-d, --deploy <platform>', 'Deployment platform (railway|vercel|docker)')
     .option('--author <name>', 'Author name')
     .option('--description <desc>', 'Project description')
+    .option('--no-telemetry', 'Disable anonymous usage analytics')
     .parse();
 
   const options = program.opts<CreateOptions>();
@@ -174,7 +175,15 @@ async function promptForConfig(initialName?: string): Promise<ProjectConfig> {
 }
 
 async function createProject(config: ProjectConfig) {
-  const targetPath = path.resolve(process.cwd(), config.name);
+  // Sanitize project name to prevent directory traversal
+  const sanitizedName = path.basename(config.name);
+  if (sanitizedName !== config.name || sanitizedName.includes('..') || sanitizedName.startsWith('.')) {
+    console.error(chalk.red(`❌ Invalid project name: ${config.name}`));
+    console.error(chalk.gray('Project name cannot contain path separators or relative path components'));
+    process.exit(1);
+  }
+  
+  const targetPath = path.resolve(process.cwd(), sanitizedName);
 
   console.log(chalk.cyan(`\n📁 Creating project: ${config.name}`));
   console.log(chalk.gray(`📂 Location: ${targetPath}`));
@@ -225,16 +234,33 @@ async function copyTemplate(config: ProjectConfig, targetPath: string) {
     await fs.copy(templatePath, targetPath);
   }
 
-  // Copy deployment configs
-  for (const platform of config.deployment) {
+  // Copy deployment configs concurrently
+  const deploymentCopies = config.deployment.map(async (platform) => {
     const deployPath = path.join(__dirname, '..', 'templates', 'deployments', platform);
     if (await fs.pathExists(deployPath)) {
       await fs.copy(deployPath, targetPath);
     }
-  }
+  });
+
+  await Promise.all(deploymentCopies);
+}
+
+function escapeTemplateValue(value: string): string {
+  // Escape special characters that could be used for injection
+  return value.replace(/[{}$`\\]/g, '\\$&');
 }
 
 async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
+  // Sanitize config values for template replacement
+  const safeConfig = {
+    name: escapeTemplateValue(config.name),
+    description: escapeTemplateValue(config.description),
+    author: {
+      name: escapeTemplateValue(config.author.name),
+      email: escapeTemplateValue(config.author.email)
+    }
+  };
+
   // Update package.json
   const packageJsonPath = path.join(targetPath, 'package.json');
   if (await fs.pathExists(packageJsonPath)) {
@@ -250,10 +276,10 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
   if (await fs.pathExists(commandsYamlPath)) {
     let commandsYaml = await fs.readFile(commandsYamlPath, 'utf-8');
     commandsYaml = commandsYaml
-      .replace(/{{name}}/g, config.name)
-      .replace(/{{description}}/g, config.description) 
-      .replace(/{{author_name}}/g, config.author.name)
-      .replace(/{{author_email}}/g, config.author.email);
+      .replace(/{{name}}/g, safeConfig.name)
+      .replace(/{{description}}/g, safeConfig.description) 
+      .replace(/{{author_name}}/g, safeConfig.author.name)
+      .replace(/{{author_email}}/g, safeConfig.author.email);
     await fs.writeFile(commandsYamlPath, commandsYaml);
   }
 
@@ -262,9 +288,9 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
   if (await fs.pathExists(readmePath)) {
     let readme = await fs.readFile(readmePath, 'utf-8');
     readme = readme
-      .replace(/{{name}}/g, config.name)
-      .replace(/{{description}}/g, config.description)
-      .replace(/{{author_name}}/g, config.author.name);
+      .replace(/{{name}}/g, safeConfig.name)
+      .replace(/{{description}}/g, safeConfig.description)
+      .replace(/{{author_name}}/g, safeConfig.author.name);
     await fs.writeFile(readmePath, readme);
   }
 }
