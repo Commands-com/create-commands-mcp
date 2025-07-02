@@ -77,6 +77,20 @@ app.get('/', (req, res) => {
   });
 });
 
+// Define authentication middleware first
+const authMiddleware = skipAuth ? 
+  (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.log('🔒 Authentication: DISABLED (dev mode)');
+    // Mock user for development
+    req.user = {
+      sub: 'dev-user',
+      email: 'dev@example.com',
+      scope: 'read_assets write_assets'
+    };
+    next();
+  } : 
+  verifyJwt;
+
 // REST API endpoints for tool discovery and execution
 // GET /mcp/tools - Tool discovery endpoint (non-JSON-RPC)
 app.get('/mcp/tools', (req, res) => {
@@ -126,20 +140,7 @@ app.post('/mcp/tools/:toolName', authMiddleware, async (req, res) => {
   }
 });
 
-// Main JSON-RPC endpoint - authentication middleware applied conditionally
-const authMiddleware = skipAuth ? 
-  (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log('🔒 Authentication: DISABLED (dev mode)');
-    // Mock user for development
-    req.user = {
-      sub: 'dev-user',
-      email: 'dev@example.com',
-      scope: 'read_assets write_assets'
-    };
-    next();
-  } : 
-  verifyJwt;
-
+// Main JSON-RPC endpoint
 app.post('/', authMiddleware, async (req, res) => {
   // All requests must be authenticated (or in dev mode)
   if (!req.user && !skipAuth) {
