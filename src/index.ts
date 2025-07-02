@@ -69,6 +69,16 @@ async function main() {
   const options = program.opts<CreateOptions>();
   const args = program.args;
 
+  function sanitizeProjectName(name: string): string {
+    if (!name?.trim()) {
+      throw new Error('Project name is required');
+    }
+    if (!/^[a-z0-9-_]+$/.test(name)) {
+      throw new Error('Project name must contain only lowercase letters, numbers, hyphens, and underscores');
+    }
+    return name;
+  }
+
   let projectName = args[0];
   let config: ProjectConfig;
 
@@ -76,7 +86,15 @@ async function main() {
     // Interactive mode
     config = await promptForConfig(projectName);
   } else {
-    // Direct mode
+    // Direct mode - validate CLI argument
+    try {
+      projectName = sanitizeProjectName(projectName);
+    } catch (error) {
+      console.error(chalk.red(`❌ ${error instanceof Error ? error.message : 'Invalid project name'}`));
+      console.error(chalk.gray('Use lowercase letters, numbers, hyphens, and underscores only'));
+      process.exit(1);
+    }
+
     config = {
       name: projectName,
       description: options.description || `MCP server created with ${options.template} template`,
@@ -175,15 +193,8 @@ async function promptForConfig(initialName?: string): Promise<ProjectConfig> {
 }
 
 async function createProject(config: ProjectConfig) {
-  // Sanitize project name to prevent directory traversal
-  const sanitizedName = path.basename(config.name);
-  if (sanitizedName !== config.name || sanitizedName.includes('..') || sanitizedName.startsWith('.')) {
-    console.error(chalk.red(`❌ Invalid project name: ${config.name}`));
-    console.error(chalk.gray('Project name cannot contain path separators or relative path components'));
-    process.exit(1);
-  }
-  
-  const targetPath = path.resolve(process.cwd(), sanitizedName);
+  // Project name is already validated, safe to use directly
+  const targetPath = path.resolve(process.cwd(), config.name);
 
   console.log(chalk.cyan(`\n📁 Creating project: ${config.name}`));
   console.log(chalk.gray(`📂 Location: ${targetPath}`));
@@ -224,7 +235,7 @@ async function copyTemplate(config: ProjectConfig, targetPath: string) {
   const templatePath = path.join(__dirname, '..', 'templates', config.template);
   const commonPath = path.join(__dirname, '..', 'templates', 'common');
 
-  // Copy common files first
+  // Copy common files first (base layer)
   if (await fs.pathExists(commonPath)) {
     await fs.copy(commonPath, targetPath);
   }
@@ -234,7 +245,7 @@ async function copyTemplate(config: ProjectConfig, targetPath: string) {
     await fs.copy(templatePath, targetPath);
   }
 
-  // Copy deployment configs concurrently
+  // Copy deployment configs in parallel (they don't conflict)
   const deploymentCopies = config.deployment.map(async (platform) => {
     const deployPath = path.join(__dirname, '..', 'templates', 'deployments', platform);
     if (await fs.pathExists(deployPath)) {
