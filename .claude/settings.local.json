@@ -13,7 +13,8 @@
       "Bash(npx create-commands-mcp:*)",
       "Bash(create-commands-mcp:*)",
       "Bash(ls:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(SKIP_AUTH=true NODE_ENV=development timeout 3s npm run dev)"
     ],
     "deny": []
   }
