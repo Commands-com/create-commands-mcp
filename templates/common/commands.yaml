@@ -12,7 +12,6 @@ author:
 
 # Server configuration
 mcp:
-  server_url: "https://your-server.railway.app"  # Update with your deployed URL
   authentication: "commands_gateway"
   health_check: "/health"
 

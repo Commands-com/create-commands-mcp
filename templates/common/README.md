@@ -130,14 +130,12 @@ curl -H "Authorization: Bearer JWT_TOKEN" http://localhost:3000/ping
 To list your server on Commands.com and receive gateway traffic:
 
 1. Deploy your server to any hosting platform (Railway, Vercel, AWS, etc.)
-2. Register your live server URL at [Commands.com Creator Portal](https://commands.com/creator/mcp-servers/new)
-3. Commands.com gateway routes user requests to your self-hosted server
-4. You handle all server hosting and scaling
+2. Register at [Commands.com Creator Portal](https://commands.com/creator/mcp-servers/new)
+3. Configure your server's proxy URL in the Commands.com UI
+4. Commands.com gateway routes user requests to your self-hosted server
+5. You handle all server hosting and scaling
 
 ```bash
-# Update .env with your deployed URL (optional)
-SERVER_URL=https://your-deployed-server.com
-
 # Verify configuration
 npm run doctor
 ```

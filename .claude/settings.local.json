@@ -14,7 +14,11 @@
       "Bash(create-commands-mcp:*)",
       "Bash(ls:*)",
       "Bash(cp:*)",
-      "Bash(SKIP_AUTH=true NODE_ENV=development timeout 3s npm run dev)"
+      "Bash(SKIP_AUTH=true NODE_ENV=development timeout 3s npm run dev)",
+      "Bash(npm audit:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

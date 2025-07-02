@@ -21,7 +21,6 @@ interface CommandsConfig {
     email: string;
   };
   mcp: {
-    server_url: string;
     authentication: string;
     health_check?: string;
   };
@@ -204,27 +203,7 @@ function validateFormats(config: CommandsConfig, errors: ValidationError[]) {
     });
   }
 
-  // Validate server URL
-  if (config.mcp?.server_url) {
-    try {
-      new URL(config.mcp.server_url);
-      if (!config.mcp.server_url.startsWith('https://')) {
-        errors.push({
-          field: 'mcp.server_url',
-          message: 'Server URL should use HTTPS in production',
-          severity: 'warning'
-        });
-      }
-    } catch {
-      errors.push({
-        field: 'mcp.server_url',
-        message: 'Invalid URL format',
-        severity: 'error'
-      });
-    }
-  }
-
-  // Validate authentication
+  // Validate authentication type
   if (config.mcp?.authentication && config.mcp.authentication !== 'commands_gateway') {
     errors.push({
       field: 'mcp.authentication',
