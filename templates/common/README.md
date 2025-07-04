@@ -71,6 +71,24 @@ export { myTool } from './myTool';
 ```bash
 npm run dev  # Start server
 npm run doctor  # Verify tool registration
+
+# Test via REST endpoint
+curl -X POST http://localhost:3000/mcp/tools/my_tool \
+  -H "Content-Type: application/json" \
+  -d '{"params": {"input": "test value"}}'
+
+# Test via JSON-RPC endpoint
+curl -X POST http://localhost:3000 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "params": {
+      "name": "my_tool",
+      "arguments": {"input": "test value"}
+    },
+    "id": 1
+  }'
 ```
 
 ### Tool Design Best Practices
@@ -239,7 +257,7 @@ src/
 ## Support
 
 - 📖 [Documentation](https://commands.com/docs/mcp)
-- 💬 [Discord Community](https://discord.gg/commands)
+- 💬 [Discord Community](https://discord.com/invite/snk8BEHfRd)
 - 🐛 [Report Issues](https://github.com/commands-com/create-commands-mcp/issues)
 
 ## License

@@ -239,7 +239,7 @@ src/
 ## Support
 
 - 📖 [Documentation](https://commands.com/docs/mcp)
-- 💬 [Discord Community](https://discord.gg/commands)
+- 💬 [Discord Community](https://discord.com/invite/snk8BEHfRd)
 - 🐛 [Report Issues](https://github.com/commands-com/create-commands-mcp/issues)
 
 ## License

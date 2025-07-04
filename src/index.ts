@@ -266,10 +266,16 @@ function escapeTemplateValue(value: string): string {
 }
 
 async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
+  // Generate unique server ID (8 character random string)
+  const uniqueId = Math.random().toString(36).substring(2, 10);
+  const serverId = `${config.name}-${uniqueId}`;
+  
   // Sanitize config values for template replacement
   const safeConfig = {
     name: escapeTemplateValue(config.name),
     description: escapeTemplateValue(config.description),
+    serverId: escapeTemplateValue(serverId),
+    uniqueString: escapeTemplateValue(uniqueId),
     author: {
       name: escapeTemplateValue(config.author.name),
       email: escapeTemplateValue(config.author.email)
@@ -286,13 +292,14 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
     await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
   }
 
-  // Update commands.yaml
+  // Update commands.yaml (Commands.com command definitions)
   const commandsYamlPath = path.join(targetPath, 'commands.yaml');
   if (await fs.pathExists(commandsYamlPath)) {
     let commandsYaml = await fs.readFile(commandsYamlPath, 'utf-8');
     commandsYaml = commandsYaml
       .replace(/{{name}}/g, safeConfig.name)
       .replace(/{{description}}/g, safeConfig.description) 
+      .replace(/{{unique-string}}/g, safeConfig.uniqueString)
       .replace(/{{author_name}}/g, safeConfig.author.name)
       .replace(/{{author_email}}/g, safeConfig.author.email);
     await fs.writeFile(commandsYamlPath, commandsYaml);
@@ -307,6 +314,20 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
       .replace(/{{description}}/g, safeConfig.description)
       .replace(/{{author_name}}/g, safeConfig.author.name);
     await fs.writeFile(readmePath, readme);
+  }
+
+  // Update mcp.yaml
+  const mcpYamlPath = path.join(targetPath, 'mcp.yaml');
+  if (await fs.pathExists(mcpYamlPath)) {
+    let mcpYaml = await fs.readFile(mcpYamlPath, 'utf-8');
+    mcpYaml = mcpYaml
+      .replace(/{{unique-string}}/g, safeConfig.uniqueString)
+      .replace(/{{PROXY_URL}}/g, '{{PROXY_URL}}') // Keep placeholder for user to fill
+      .replace(/{{name}}/g, safeConfig.name)
+      .replace(/{{description}}/g, safeConfig.description)
+      .replace(/{{author_name}}/g, safeConfig.author.name)
+      .replace(/{{author_email}}/g, safeConfig.author.email);
+    await fs.writeFile(mcpYamlPath, mcpYaml);
   }
 }
 
