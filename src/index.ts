@@ -240,9 +240,11 @@ async function executeProjectCreation(config: ProjectConfig) {
     console.log(chalk.white('   3. cp .env.example .env'));
     console.log(chalk.white('   4. npm run dev  # Test locally'));
     console.log(chalk.white('   5. git init && git add . && git commit -m "Initial commit"'));
-    console.log(chalk.white('   6. Deploy to Railway/Vercel (connects to your GitHub repo)'));
-    console.log(chalk.white('   7. npx create-commands-mcp set-proxy <your-live-url>'));
-    console.log(chalk.white('   8. Register at Commands.com Creator Portal'));
+    console.log(chalk.white('   6. git remote add origin <your-github-repo-url>'));
+    console.log(chalk.white('   7. git push -u origin main'));
+    console.log(chalk.white('   8. Deploy to Railway/Vercel (connects to your GitHub repo)'));
+    console.log(chalk.white('   9. npx create-commands-mcp set-proxy <your-live-url>'));
+    console.log(chalk.white('  10. Register at Commands.com Creator Portal'));
     console.log(chalk.gray('\n📚 See README.md for detailed deployment instructions'));
     
   } catch (error) {
