@@ -381,7 +381,7 @@ async function setProxyUrl(url: string) {
     console.log(chalk.gray('\n📋 Next steps:'));
     console.log(chalk.white('   1. Commit and push your changes to git'));
     console.log(chalk.white('   2. Register at Commands.com Creator Portal'));
-    console.log(chalk.white('   3. Submit your server URL for marketplace review'));
+    console.log(chalk.white('   3. Import your MCP repo to Commands.com'));
     
   } catch (error) {
     console.error(chalk.red('❌ Error updating PROXY_URL:'), error);
