@@ -81,6 +81,14 @@ async function main() {
       await setProxyUrl(url);
     });
 
+  // Show next steps command
+  program
+    .command('next-steps')
+    .description('Show the deployment workflow steps again')
+    .action(async () => {
+      await showNextSteps();
+    });
+
   await program.parseAsync();
 }
 
@@ -246,6 +254,7 @@ async function executeProjectCreation(config: ProjectConfig) {
     console.log(chalk.white('   9. npx create-commands-mcp set-proxy <your-live-url>'));
     console.log(chalk.white('  10. Deploy to Commands.com (connects to your GitHub repo)'));
     console.log(chalk.gray('\n📚 See README.md for detailed deployment instructions'));
+    console.log(chalk.gray('💡 Run "npx create-commands-mcp next-steps" to see these steps again'));
     
   } catch (error) {
     console.error(chalk.red('❌ Error creating project:'), error);
@@ -390,6 +399,51 @@ async function setProxyUrl(url: string) {
     
   } catch (error) {
     console.error(chalk.red('❌ Error updating PROXY_URL:'), error);
+    process.exit(1);
+  }
+}
+
+async function showNextSteps() {
+  // Check if we're in a project directory with package.json
+  const packageJsonPath = path.join(process.cwd(), 'package.json');
+  const mcpYamlPath = path.join(process.cwd(), 'mcp.yaml');
+  
+  if (!await fs.pathExists(packageJsonPath)) {
+    console.error(chalk.red('❌ No package.json found in current directory'));
+    console.error(chalk.gray('Make sure you are in the root of your MCP project'));
+    process.exit(1);
+  }
+
+  try {
+    const packageJson = await fs.readJson(packageJsonPath);
+    const projectName = packageJson.name || 'your-project';
+    
+    console.log(chalk.green.bold('\n✅ MCP Server Deployment Steps\n'));
+    console.log(chalk.cyan('📋 Complete workflow:'));
+    console.log(chalk.white(`   1. cd ${projectName}`));
+    console.log(chalk.white('   2. npm install'));
+    console.log(chalk.white('   3. cp .env.example .env'));
+    console.log(chalk.white('   4. npm run dev  # Test locally'));
+    console.log(chalk.white('   5. git init && git add . && git commit -m "Initial commit"'));
+    console.log(chalk.white('   6. git remote add origin <your-github-repo-url>'));
+    console.log(chalk.white('   7. git push -u origin main'));
+    console.log(chalk.white('   8. Deploy to Railway/Vercel (hosts your server)'));
+    console.log(chalk.white('   9. npx create-commands-mcp set-proxy <your-live-url>'));
+    console.log(chalk.white('  10. Deploy to Commands.com (connects to your GitHub repo)'));
+    
+    // Check if proxy URL has been set
+    if (await fs.pathExists(mcpYamlPath)) {
+      const mcpYaml = await fs.readFile(mcpYamlPath, 'utf-8');
+      if (!mcpYaml.includes('{{PROXY_URL}}')) {
+        console.log(chalk.gray('\n✓ PROXY_URL has been set in mcp.yaml'));
+        console.log(chalk.yellow('📌 You are on step 10: Deploy to Commands.com'));
+      }
+    }
+    
+    console.log(chalk.gray('\n📚 See README.md for detailed deployment instructions'));
+    
+  } catch (error) {
+    console.error(chalk.red('❌ Error reading project information'));
     process.exit(1);
   }
 }
