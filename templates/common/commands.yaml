@@ -1,51 +1,63 @@
-# Commands.com MCP Server Configuration
-# This file defines your server for the Commands.com marketplace
-
 name: {{name}}
 description: {{description}}
 version: 1.0.0
+author: {{author_name}}
+license: MIT
 
-# Author information
-author:
-  name: {{author_name}}
-  email: {{author_email}}
+commands:
+  - name: test-mcp-server
+    title: Test MCP Server Capabilities
+    type: command
+    category: development
+    commandName: "/test-mcp"
+    aiPlatform: "claude-code@2025.06"
+    description: Comprehensive test of MCP server functionality including connectivity, message processing, and system information. Perfect for validating your MCP server deployment and demonstrating all available tools.
+    content: command-docs/command.md
+    readme: command-docs/README.md
+    license: LICENSE
+    thumbnail: command-docs/preview.png
+    inputParameters:
+      - name: test_type
+        label: Test Type
+        description: Type of test to run
+        type: select
+        required: false
+        defaultValue: "all"
+        options: ["all", "connectivity", "message", "datetime"]
+      - name: echo_message
+        label: Echo Message
+        description: Custom message to test echo functionality
+        type: text
+        required: false
+        defaultValue: "Hello from Commands.com! Testing MCP server."
+      - name: uppercase_echo
+        label: Uppercase Echo
+        description: Whether to return echo message in uppercase
+        type: select
+        required: false
+        defaultValue: "yes"
+        options: ["yes", "no"]
+      - name: datetime_format
+        label: DateTime Format
+        description: Format for datetime output
+        type: select
+        required: false
+        defaultValue: "all"
+        options: ["all", "iso", "unix", "readable"]
+    mcpRequirements:
+      - serverId: "{{name}}-{{unique-string}}"
+        tier: required
+        version: "1.0.0"
+        name: "{{name}}"
+        description: "{{description}}"
 
-# Server configuration
-mcp:
-  authentication: "commands_gateway"
-  health_check: "/health"
-
-# Available tools (auto-generated from your implementation)
-tools:
-  - name: ping
-    description: "Test server connectivity and responsiveness"
-    category: "utility"
-  
-  - name: echo
-    description: "Echo back user input for testing"
-    category: "utility"
-    
-  - name: datetime
-    description: "Get current date and time in various formats"
-    category: "utility"
-
-# Marketplace information
-categories: ["utility", "development"]
-tags: ["mcp", "development", "testing"]
-pricing: "free"
-
-# Optional: Advanced configuration
-rate_limits:
-  requests_per_minute: 60
-  requests_per_hour: 1000
-
-# Optional: Required scopes from Commands.com
-scopes:
-  - read_assets   # For accessing user's Commands.com assets
-  # - write_assets  # For modifying user's assets (uncomment if needed)
-
-# Optional: Deployment information
-deployment:
-  type: "http_server"
-  health_check_path: "/health"
-  timeout_seconds: 30
+metadata:
+  created: "2025-07-03"
+  updated: "2025-07-03"
+  total_commands: 1
+  supported_platforms:
+    - claude-code
+    - claude
+  minimum_requirements:
+    - MCP support
+    - Commands.com JWT authentication
