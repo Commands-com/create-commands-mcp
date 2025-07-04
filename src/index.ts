@@ -351,12 +351,17 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
 
 async function setProxyUrl(url: string) {
   try {
+    // Auto-add https:// if no protocol is provided
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = `https://${url}`;
+    }
+
     // Validate URL format
     try {
       new URL(url);
     } catch {
       console.error(chalk.red('❌ Invalid URL format'));
-      console.error(chalk.gray('Example: https://my-server-production.up.railway.app'));
+      console.error(chalk.gray('Example: my-server-production.up.railway.app or https://my-server.com'));
       process.exit(1);
     }
 
