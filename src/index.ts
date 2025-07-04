@@ -59,6 +59,7 @@ const TEMPLATES = {
 async function main() {
   console.log(chalk.blue.bold('🚀 Create Commands MCP Server\n'));
 
+  // Default command - create project
   program
     .version(version)
     .description('Create a new MCP server for Commands.com')
@@ -68,10 +69,22 @@ async function main() {
     .option('-d, --deploy <platform>', 'Deployment platform (railway|vercel|docker)')
     .option('--author <name>', 'Author name')
     .option('--description <desc>', 'Project description')
-    .parse();
+    .action(async (name, options) => {
+      await createProject(name, options);
+    });
 
-  const options = program.opts<CreateOptions>();
-  const args = program.args;
+  // Set proxy URL command
+  program
+    .command('set-proxy <url>')
+    .description('Update PROXY_URL in mcp.yaml with your deployed server URL')
+    .action(async (url) => {
+      await setProxyUrl(url);
+    });
+
+  await program.parseAsync();
+}
+
+async function createProject(projectName: string, options: CreateOptions) {
 
   function sanitizeProjectName(name: string): string {
     if (!name?.trim()) {
@@ -83,7 +96,6 @@ async function main() {
     return name;
   }
 
-  let projectName = args[0];
   let config: ProjectConfig;
 
   if (!projectName) {
@@ -112,7 +124,7 @@ async function main() {
     };
   }
 
-  await createProject(config);
+  await executeProjectCreation(config);
 }
 
 async function promptForConfig(initialName?: string): Promise<ProjectConfig> {
@@ -196,7 +208,7 @@ async function promptForConfig(initialName?: string): Promise<ProjectConfig> {
   };
 }
 
-async function createProject(config: ProjectConfig) {
+async function executeProjectCreation(config: ProjectConfig) {
   // Project name is already validated, safe to use directly
   const targetPath = path.resolve(process.cwd(), config.name);
 
@@ -226,8 +238,12 @@ async function createProject(config: ProjectConfig) {
     console.log(chalk.white(`   1. cd ${config.name}`));
     console.log(chalk.white('   2. npm install'));
     console.log(chalk.white('   3. cp .env.example .env'));
-    console.log(chalk.white('   4. npm run dev'));
-    console.log(chalk.gray('\n📚 See README.md for detailed setup instructions'));
+    console.log(chalk.white('   4. npm run dev  # Test locally'));
+    console.log(chalk.white('   5. git init && git add . && git commit -m "Initial commit"'));
+    console.log(chalk.white('   6. Deploy to Railway/Vercel (connects to your GitHub repo)'));
+    console.log(chalk.white('   7. npx create-commands-mcp set-proxy <your-live-url>'));
+    console.log(chalk.white('   8. Register at Commands.com Creator Portal'));
+    console.log(chalk.gray('\n📚 See README.md for detailed deployment instructions'));
     
   } catch (error) {
     console.error(chalk.red('❌ Error creating project:'), error);
@@ -328,6 +344,46 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
       .replace(/{{author_name}}/g, safeConfig.author.name)
       .replace(/{{author_email}}/g, safeConfig.author.email);
     await fs.writeFile(mcpYamlPath, mcpYaml);
+  }
+}
+
+async function setProxyUrl(url: string) {
+  try {
+    // Validate URL format
+    try {
+      new URL(url);
+    } catch {
+      console.error(chalk.red('❌ Invalid URL format'));
+      console.error(chalk.gray('Example: https://my-server-production.up.railway.app'));
+      process.exit(1);
+    }
+
+    // Check if mcp.yaml exists in current directory
+    const mcpYamlPath = path.join(process.cwd(), 'mcp.yaml');
+    if (!await fs.pathExists(mcpYamlPath)) {
+      console.error(chalk.red('❌ mcp.yaml not found in current directory'));
+      console.error(chalk.gray('Make sure you are in the root of your MCP project'));
+      process.exit(1);
+    }
+
+    // Read and update mcp.yaml
+    let mcpYaml = await fs.readFile(mcpYamlPath, 'utf-8');
+    
+    // Replace {{PROXY_URL}} placeholder with actual URL
+    mcpYaml = mcpYaml.replace(/{{PROXY_URL}}/g, url);
+    
+    await fs.writeFile(mcpYamlPath, mcpYaml);
+    
+    console.log(chalk.green.bold('✅ PROXY_URL updated successfully!'));
+    console.log(chalk.cyan(`🔗 Server URL: ${url}`));
+    console.log(chalk.gray('\n📋 Next steps:'));
+    console.log(chalk.white('   1. Commit and push your changes to git'));
+    console.log(chalk.white('   2. Register at Commands.com Creator Portal'));
+    console.log(chalk.white('   3. Submit your server URL for marketplace review'));
+    
+  } catch (error) {
+    console.error(chalk.red('❌ Error updating PROXY_URL:'), error);
+    process.exit(1);
   }
 }
 
