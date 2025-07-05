@@ -65,7 +65,7 @@ When testing is complete, provide:
 
 ## Important Notes
 
-- The MCP server ID is: create-commands-mcp-{{unique-string}}
+- The MCP server ID is: {{name}}-{{unique-string}}
 - All tools should be accessed through the Commands.com gateway
 - Authentication errors indicate JWT configuration issues
 - Network errors suggest deployment or proxy configuration problems

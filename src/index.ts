@@ -356,6 +356,19 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
       .replace(/{{author_email}}/g, safeConfig.author.email);
     await fs.writeFile(mcpYamlPath, mcpYaml);
   }
+
+  // Update command-docs/command.md
+  const commandMdPath = path.join(targetPath, 'command-docs', 'command.md');
+  if (await fs.pathExists(commandMdPath)) {
+    let commandMd = await fs.readFile(commandMdPath, 'utf-8');
+    commandMd = commandMd
+      .replace(/{{name}}/g, safeConfig.name)
+      .replace(/{{description}}/g, safeConfig.description)
+      .replace(/{{unique-string}}/g, safeConfig.uniqueString)
+      .replace(/{{author_name}}/g, safeConfig.author.name)
+      .replace(/{{author_email}}/g, safeConfig.author.email);
+    await fs.writeFile(commandMdPath, commandMd);
+  }
 }
 
 async function setProxyUrl(url: string) {
