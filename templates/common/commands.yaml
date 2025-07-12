@@ -45,7 +45,7 @@ commands:
         defaultValue: "all"
         options: ["all", "iso", "unix", "readable"]
     mcpRequirements:
-      - serverId: "{{name}}-{{unique-string}}"
+      - serverId: "{{name}}"
         tier: required
         version: "1.0.0"
         name: "{{name}}"

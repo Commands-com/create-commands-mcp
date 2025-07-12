@@ -11,7 +11,7 @@ metadata:
 
 server:
   # Basic Configuration
-  serverId: "{{name}}-{{unique-string}}"
+  serverId: "{{name}}"
   displayName: "{{name}}"
   description: "{{description}}"
   category: "utility"
@@ -22,7 +22,8 @@ server:
   
   # Version & Status
   version: "1.0.0"
-  status: "stable"
+  status: "alpha"
+  # loomId: "a4d14776b5ae4570a8fa3da9f961b4f1"
     
   # Authentication
   auth:

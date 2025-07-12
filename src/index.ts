@@ -293,16 +293,14 @@ function escapeTemplateValue(value: string): string {
 }
 
 async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
-  // Generate unique server ID (8 character random string)
-  const uniqueId = Math.random().toString(36).substring(2, 10);
-  const serverId = `${config.name}-${uniqueId}`;
+  // Use project name as server ID (no random string needed with namespacing)
+  const serverId = config.name;
   
   // Sanitize config values for template replacement
   const safeConfig = {
     name: escapeTemplateValue(config.name),
     description: escapeTemplateValue(config.description),
     serverId: escapeTemplateValue(serverId),
-    uniqueString: escapeTemplateValue(uniqueId),
     author: {
       name: escapeTemplateValue(config.author.name),
       email: escapeTemplateValue(config.author.email)
@@ -326,7 +324,7 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
     commandsYaml = commandsYaml
       .replace(/{{name}}/g, safeConfig.name)
       .replace(/{{description}}/g, safeConfig.description) 
-      .replace(/{{unique-string}}/g, safeConfig.uniqueString)
+      .replace(/{{unique-string}}/g, safeConfig.name)
       .replace(/{{author_name}}/g, safeConfig.author.name)
       .replace(/{{author_email}}/g, safeConfig.author.email);
     await fs.writeFile(commandsYamlPath, commandsYaml);
@@ -348,7 +346,7 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
   if (await fs.pathExists(mcpYamlPath)) {
     let mcpYaml = await fs.readFile(mcpYamlPath, 'utf-8');
     mcpYaml = mcpYaml
-      .replace(/{{unique-string}}/g, safeConfig.uniqueString)
+      .replace(/{{unique-string}}/g, safeConfig.name)
       .replace(/{{PROXY_URL}}/g, '{{PROXY_URL}}') // Keep placeholder for user to fill
       .replace(/{{name}}/g, safeConfig.name)
       .replace(/{{description}}/g, safeConfig.description)
@@ -364,7 +362,7 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
     commandMd = commandMd
       .replace(/{{name}}/g, safeConfig.name)
       .replace(/{{description}}/g, safeConfig.description)
-      .replace(/{{unique-string}}/g, safeConfig.uniqueString)
+      .replace(/{{unique-string}}/g, safeConfig.name)
       .replace(/{{author_name}}/g, safeConfig.author.name)
       .replace(/{{author_email}}/g, safeConfig.author.email);
     await fs.writeFile(commandMdPath, commandMd);

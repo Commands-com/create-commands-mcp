@@ -50,9 +50,9 @@ app.get('/.well-known/mcp.json', (req, res) => {
     description: process.env.npm_package_description || '{{description}}',
     license: "MIT",
     capabilities: {
-      tools: {},
-      resources: {},
-      prompts: {}
+      tools: {
+        listChanged: true
+      }
     },
     serverInfo: {
       name: process.env.npm_package_name || '{{name}}',
@@ -180,11 +180,11 @@ app.post('/', authMiddleware, async (req, res) => {
         return res.json({
           jsonrpc: '2.0',
           result: {
-            protocolVersion: '2024-11-05',
+            protocolVersion: '2025-06-18',
             capabilities: {
-              tools: {},
-              resources: {},
-              prompts: {}
+              tools: {
+                listChanged: true
+              }
             },
             serverInfo: {
               name: process.env.npm_package_name || '{{name}}',
