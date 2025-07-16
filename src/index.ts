@@ -252,7 +252,7 @@ async function executeProjectCreation(config: ProjectConfig) {
     console.log(chalk.white('   7. git push -u origin main'));
     console.log(chalk.white('   8. Deploy to Railway/Vercel (hosts your server)'));
     console.log(chalk.white('   9. npx create-commands-mcp set-proxy <your-live-url>'));
-    console.log(chalk.white('  10. Deploy to Commands.com (connects to your GitHub repo)'));
+    console.log(chalk.white('  10. Update GitHub repo with proxy URL and deploy to Commands.com'));
     console.log(chalk.gray('\n📚 See README.md for detailed deployment instructions'));
     console.log(chalk.gray('💡 Run "npx create-commands-mcp next-steps" to see these steps again'));
     
@@ -440,14 +440,14 @@ async function showNextSteps() {
     console.log(chalk.white('   7. git push -u origin main'));
     console.log(chalk.white('   8. Deploy to Railway/Vercel (hosts your server)'));
     console.log(chalk.white('   9. npx create-commands-mcp set-proxy <your-live-url>'));
-    console.log(chalk.white('  10. Deploy to Commands.com (connects to your GitHub repo)'));
+    console.log(chalk.white('  10. Update GitHub repo with proxy URL and deploy to Commands.com'));
     
     // Check if proxy URL has been set
     if (await fs.pathExists(mcpYamlPath)) {
       const mcpYaml = await fs.readFile(mcpYamlPath, 'utf-8');
       if (!mcpYaml.includes('{{PROXY_URL}}')) {
         console.log(chalk.gray('\n✓ PROXY_URL has been set in mcp.yaml'));
-        console.log(chalk.yellow('📌 You are on step 10: Deploy to Commands.com'));
+        console.log(chalk.yellow('📌 You are on step 10: Update GitHub repo with proxy URL and deploy to Commands.com'));
       }
     }
     

@@ -5,13 +5,13 @@ author: {{author_name}}
 license: MIT
 
 commands:
-  - name: test-mcp-server
-    title: Test MCP Server Capabilities
+  - name: test-server
+    title: Test Server Capabilities
     type: command
     category: development
-    commandName: "/test-mcp"
+    commandName: "/test-server"
     aiPlatform: "claude-code@2025.06"
-    description: Comprehensive test of MCP server functionality including connectivity, message processing, and system information. Perfect for validating your MCP server deployment and demonstrating all available tools.
+    description: Comprehensive test of server functionality including connectivity, message processing, and system information. Perfect for validating your server deployment and demonstrating all available tools.
     content: command-docs/command.md
     readme: command-docs/README.md
     license: LICENSE
@@ -29,7 +29,7 @@ commands:
         description: Custom message to test echo functionality
         type: text
         required: false
-        defaultValue: "Hello from Commands.com! Testing MCP server."
+        defaultValue: "Hello from Commands.com! Testing server."
       - name: uppercase_echo
         label: Uppercase Echo
         description: Whether to return echo message in uppercase
