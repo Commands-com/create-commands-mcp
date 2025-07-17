@@ -21,7 +21,7 @@ const program = new Command();
 interface CreateOptions {
   template: 'basic' | 'api' | 'data';
   lang: 'typescript' | 'javascript';
-  deploy?: 'railway' | 'vercel' | 'docker';
+  deploy?: 'railway' | 'vercel' | 'docker' | 'aws';
   author?: string;
   description?: string;
 }
@@ -66,7 +66,7 @@ async function main() {
     .argument('[name]', 'Project name')
     .option('-t, --template <type>', 'Template type (basic|api|data)', 'basic')
     .option('-l, --lang <language>', 'Language (typescript|javascript)', 'typescript')
-    .option('-d, --deploy <platform>', 'Deployment platform (railway|vercel|docker)')
+    .option('-d, --deploy <platform>', 'Deployment platform (railway|vercel|docker|aws)')
     .option('--author <name>', 'Author name')
     .option('--description <desc>', 'Project description')
     .action(async (name, options) => {
@@ -198,7 +198,8 @@ async function promptForConfig(initialName?: string): Promise<ProjectConfig> {
       choices: [
         { name: 'Railway (recommended)', value: 'railway' },
         { name: 'Vercel', value: 'vercel' },
-        { name: 'Docker', value: 'docker' }
+        { name: 'Docker', value: 'docker' },
+        { name: 'AWS App Runner', value: 'aws' }
       ]
     }
   ]);
@@ -250,7 +251,7 @@ async function executeProjectCreation(config: ProjectConfig) {
     console.log(chalk.white('   5. git init && git add . && git commit -m "Initial commit"'));
     console.log(chalk.white('   6. git remote add origin <your-github-repo-url>'));
     console.log(chalk.white('   7. git push -u origin main'));
-    console.log(chalk.white('   8. Deploy to Railway/Vercel (hosts your server)'));
+    console.log(chalk.white('   8. Deploy to Railway/Vercel/AWS (hosts your server)'));
     console.log(chalk.white('   9. npx create-commands-mcp set-proxy <your-live-url>'));
     console.log(chalk.white('  10. Update GitHub repo with proxy URL and deploy to Commands.com'));
     console.log(chalk.gray('\n📚 See README.md for detailed deployment instructions'));
@@ -438,7 +439,7 @@ async function showNextSteps() {
     console.log(chalk.white('   5. git init && git add . && git commit -m "Initial commit"'));
     console.log(chalk.white('   6. git remote add origin <your-github-repo-url>'));
     console.log(chalk.white('   7. git push -u origin main'));
-    console.log(chalk.white('   8. Deploy to Railway/Vercel (hosts your server)'));
+    console.log(chalk.white('   8. Deploy to Railway/Vercel/AWS (hosts your server)'));
     console.log(chalk.white('   9. npx create-commands-mcp set-proxy <your-live-url>'));
     console.log(chalk.white('  10. Update GitHub repo with proxy URL and deploy to Commands.com'));
     

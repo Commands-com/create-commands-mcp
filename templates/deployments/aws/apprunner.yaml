@@ -1,0 +1,20 @@
+version: 1.0
+runtime: nodejs18
+build:
+  commands:
+    build:
+      - npm ci --production=false
+      - npm run build
+    post-build:
+      - npm prune --production
+run:
+  runtime-version: latest
+  command: npm start
+  network:
+    port: 3000
+    env: PORT
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: COMMANDS_JWT_ISSUER
+      value: "https://api.commands.com"
