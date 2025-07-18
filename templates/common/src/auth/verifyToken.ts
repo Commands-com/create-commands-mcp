@@ -71,7 +71,10 @@ export function verifyJwt(req: Request, res: Response, next: NextFunction): void
     },
     (err, decoded) => {
       if (err) {
-        console.error('JWT verification failed:', err.message);
+        // Only log JWT errors in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error('JWT verification failed:', err.message);
+        }
         res.status(401).json({
           jsonrpc: '2.0',
           error: {

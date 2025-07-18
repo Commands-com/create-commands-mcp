@@ -21,6 +21,7 @@ npm run dev
 
 - ✨ **Zero-config setup** - Working MCP server in under 5 minutes
 - 🔐 **Commands.com JWT authentication** - Built-in gateway integration
+- 🌊 **Server-Sent Events (SSE)** - Real-time streaming support for gateway compatibility
 - 🛠️ **Multiple templates** - Basic, API integration, and data processing
 - 📦 **Zero production dependencies** - Lightweight and secure
 - 🔧 **Developer experience** - TypeScript, testing, and health checks
@@ -217,6 +218,33 @@ Commands.com provides a complete business platform for just **15% revenue share*
 - ✅ **Lower than competitors** - Most platforms take 20-30%
 
 **Build tools, not businesses.** Commands.com handles everything else.
+
+## Server-Sent Events (SSE) Support
+
+The generated MCP servers include built-in SSE support for compatibility with modern gateways like Commands.com API Gateway. This enables:
+
+- **Real-time streaming** - Progressive responses for long-running operations
+- **Automatic fallback** - Works with both SSE-enabled and standard HTTP clients
+- **Gateway compatibility** - Seamless integration with proxy servers
+- **No configuration needed** - SSE is automatically enabled when client sends `Accept: text/event-stream`
+
+### How it works:
+```javascript
+// Your MCP server automatically detects SSE support
+// When a client accepts text/event-stream:
+if (req.headers.accept?.includes('text/event-stream')) {
+  // Response is automatically streamed as SSE
+  return sendStreamingResponse(res, result, id);
+}
+// Otherwise, standard JSON response is used
+```
+
+### Supported methods:
+- `tools/list`, `tools/call` - Tool discovery and execution
+- `resources/list`, `resources/read` - Resource management (when implemented)
+- `prompts/list`, `prompts/get` - Prompt handling (when implemented)
+
+The gateway handles all SSE protocol details including event IDs, heartbeats, and connection management.
 
 ## Support
 

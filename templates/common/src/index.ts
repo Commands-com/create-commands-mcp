@@ -24,11 +24,31 @@ app.use(cors({
 // Parse JSON bodies
 app.use(express.json({ limit: '10mb' }));
 
-// Request logging
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} ${req.method} ${req.path}`);
-  next();
-});
+// Helper function to send streaming responses for SSE-enabled gateways
+// This enables compatibility with Commands.com API Gateway and other SSE-supporting proxies
+function sendStreamingResponse(res: express.Response, result: any, id: any) {
+  // Set headers for SSE streaming
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  
+  // Send the complete JSON-RPC response as a single SSE event
+  // The gateway will handle event IDs, heartbeats, and other SSE protocol details
+  const response = { jsonrpc: '2.0', result, id };
+  res.write(`data: ${JSON.stringify(response)}\n\n`);
+  
+  // End the response
+  res.end();
+}
+
+// Request logging (only in development)
+if (isDevelopment) {
+  app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} ${req.method} ${req.path}`);
+    next();
+  });
+}
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
@@ -80,7 +100,9 @@ app.get('/', (req, res) => {
 // Define authentication middleware first
 const authMiddleware = skipAuth ? 
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log('🔒 Authentication: DISABLED (dev mode)');
+    if (isDevelopment) {
+      console.log('Authentication: DISABLED (dev mode)');
+    }
     // Mock user for development
     req.user = {
       sub: 'dev-user',
@@ -108,7 +130,10 @@ app.post('/mcp/tools/:toolName', authMiddleware, async (req, res) => {
   const { toolName } = req.params;
   const { params = {} } = req.body;
   
-  console.log(`[REST] Tool execution: ${toolName} with params:`, params);
+  // Log REST API calls in development
+  if (isDevelopment) {
+    console.log(`[REST] Tool execution: ${toolName} with params:`, params);
+  }
   
   try {
     // Find the tool
@@ -142,6 +167,8 @@ app.post('/mcp/tools/:toolName', authMiddleware, async (req, res) => {
 
 // Main JSON-RPC endpoint
 app.post('/', authMiddleware, async (req, res) => {
+  // Check if client supports SSE (passed through by gateway)
+  const acceptsSSE = req.headers.accept?.includes('text/event-stream');
   // All requests must be authenticated (or in dev mode)
   if (!req.user && !skipAuth) {
     return res.status(401).json({
@@ -161,7 +188,10 @@ app.post('/', authMiddleware, async (req, res) => {
   // Handle JSON-RPC request
   const { method, params, id, jsonrpc } = req.body;
   
-  console.log(`[MCP] JSON-RPC Request: method=${method}, id=${id}, user=${userEmail || userID}`);
+  // Log requests in development
+  if (isDevelopment) {
+    console.log(`[MCP] JSON-RPC Request: method=${method}, id=${id}, user=${userEmail || userID}`);
+  }
   
   if (jsonrpc !== '2.0') {
     return res.status(400).json({
@@ -199,40 +229,64 @@ app.post('/', authMiddleware, async (req, res) => {
         return res.status(200).end();
         
       case 'tools/list':
+        const toolsResult = {
+          tools: tools.map((tool: Tool) => ({
+            name: tool.name,
+            description: tool.description,
+            inputSchema: tool.inputSchema
+          }))
+        };
+        
+        // Use SSE if client supports it
+        if (acceptsSSE) {
+          return sendStreamingResponse(res, toolsResult, id);
+        }
+        
         return res.json({
           jsonrpc: '2.0',
-          result: {
-            tools: tools.map((tool: Tool) => ({
-              name: tool.name,
-              description: tool.description,
-              inputSchema: tool.inputSchema
-            }))
-          },
+          result: toolsResult,
           id
         });
         
       case 'resources/list':
+        const resourcesResult = {
+          resources: []
+        };
+        
+        // Use SSE if client supports it
+        if (acceptsSSE) {
+          return sendStreamingResponse(res, resourcesResult, id);
+        }
+        
         return res.json({
           jsonrpc: '2.0',
-          result: {
-            resources: []
-          },
+          result: resourcesResult,
           id
         });
         
       case 'prompts/list':
+        const promptsResult = {
+          prompts: []
+        };
+        
+        // Use SSE if client supports it
+        if (acceptsSSE) {
+          return sendStreamingResponse(res, promptsResult, id);
+        }
+        
         return res.json({
           jsonrpc: '2.0',
-          result: {
-            prompts: []
-          },
+          result: promptsResult,
           id
         });
         
       case 'tools/call':
         // Handle tool execution
         const { name: toolName, arguments: toolArgs } = params;
-        console.log(`[MCP] Tool call: ${toolName} with args:`, toolArgs);
+        // Log tool calls in development
+        if (isDevelopment) {
+          console.log(`[MCP] Tool call: ${toolName} with args:`, toolArgs);
+        }
         
         // Find the tool
         const tool = tools.find((t: Tool) => t.name === toolName);
@@ -252,16 +306,23 @@ app.post('/', authMiddleware, async (req, res) => {
           const result = await tool.handler(toolArgs || {});
           
           // Format response according to MCP spec
+          const toolResult = {
+            content: [
+              {
+                type: 'text',
+                text: typeof result === 'string' ? result : JSON.stringify(result, null, 2)
+              }
+            ]
+          };
+          
+          // Use SSE if client supports it
+          if (acceptsSSE) {
+            return sendStreamingResponse(res, toolResult, id);
+          }
+          
           return res.json({
             jsonrpc: '2.0',
-            result: {
-              content: [
-                {
-                  type: 'text',
-                  text: typeof result === 'string' ? result : JSON.stringify(result, null, 2)
-                }
-              ]
-            },
+            result: toolResult,
             id
           });
         } catch (toolError) {
@@ -275,6 +336,32 @@ app.post('/', authMiddleware, async (req, res) => {
             id
           });
         }
+        
+      case 'resources/read':
+        // Handle resource read if implemented
+        const { uri } = params || {};
+        // This is a placeholder - implement your resource reading logic here
+        return res.json({
+          jsonrpc: '2.0',
+          error: {
+            code: -32602,
+            message: 'Resources not implemented in this server'
+          },
+          id
+        });
+        
+      case 'prompts/get':
+        // Handle prompt retrieval if implemented
+        const { name } = params || {};
+        // This is a placeholder - implement your prompt logic here
+        return res.json({
+          jsonrpc: '2.0',
+          error: {
+            code: -32602,
+            message: 'Prompts not implemented in this server'
+          },
+          id
+        });
         
       default:
         return res.status(404).json({
@@ -323,11 +410,14 @@ app.use((error: Error, req: express.Request, res: express.Response, next: expres
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 MCP Server running on http://localhost:${PORT}`);
-  console.log(`📋 Available tools: ${tools.map((t: Tool) => t.name).join(', ')}`);
-  console.log(`🔒 Authentication: ${skipAuth ? 'DISABLED (dev mode)' : 'ENABLED'}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔧 MCP Discovery: http://localhost:${PORT}/.well-known/mcp.json`);
+  console.log(`MCP Server running on http://localhost:${PORT}`);
+  
+  if (isDevelopment) {
+    console.log(`Available tools: ${tools.map((t: Tool) => t.name).join(', ')}`);
+    console.log(`Authentication: ${skipAuth ? 'DISABLED (dev mode)' : 'ENABLED'}`);
+    console.log(`Health check: http://localhost:${PORT}/health`);
+    console.log(`MCP Discovery: http://localhost:${PORT}/.well-known/mcp.json`);
+  }
 });
 
 export default app;
