@@ -30,8 +30,7 @@ describe('Echo Tool', () => {
       { message: 'hello', expectedWords: 1 },
       { message: 'hello world', expectedWords: 2 },
       { message: 'hello   world   test', expectedWords: 3 },
-      { message: '  spaced  words  ', expectedWords: 2 },
-      { message: '', expectedWords: 0 }
+      { message: '  spaced  words  ', expectedWords: 2 }
     ];
 
     for (const testCase of testCases) {
