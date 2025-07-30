@@ -147,8 +147,13 @@ app.post('/mcp/tools/:toolName', authMiddleware, async (req, res) => {
       });
     }
     
-    // Execute the tool
-    const result = await tool.handler(params);
+    // Execute the tool with context
+    const context = {
+      user: req.user,
+      jwt: req.headers.authorization,
+      headers: req.headers
+    };
+    const result = await tool.handler(params, context);
     
     // Return direct result (not JSON-RPC format)
     res.json({ result });
@@ -302,8 +307,13 @@ app.post('/', authMiddleware, async (req, res) => {
         }
         
         try {
-          // Execute the tool
-          const result = await tool.handler(toolArgs || {});
+          // Execute the tool with context including JWT
+          const context = {
+            user: req.user,
+            jwt: req.headers.authorization,
+            headers: req.headers
+          };
+          const result = await tool.handler(toolArgs || {}, context);
           
           // Format response according to MCP spec
           const toolResult = {

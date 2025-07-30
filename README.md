@@ -15,6 +15,9 @@ cd my-server
 npm install
 cp .env.example .env
 npm run dev
+
+# Optional: For Commands.com marketplace deployment
+npx create-commands-mcp set-org <your-commands-org>
 ```
 
 ## Features
@@ -22,6 +25,7 @@ npm run dev
 - ✨ **Zero-config setup** - Working MCP server in under 5 minutes
 - 🔐 **Commands.com JWT authentication** - Built-in gateway integration
 - 🌊 **Server-Sent Events (SSE)** - Real-time streaming support for gateway compatibility
+- 📊 **Usage tracking** - Built-in usage stats tool and token accounting
 - 🛠️ **Multiple templates** - Basic, API integration, and data processing
 - 📦 **Zero production dependencies** - Lightweight and secure
 - 🔧 **Developer experience** - TypeScript, testing, and health checks
@@ -52,8 +56,9 @@ npx create-commands-mcp my-server --template=basic --deploy=docker
 ## Templates
 
 ### Basic Template (Default)
-- **Tools**: ping, echo, datetime
+- **Tools**: ping, echo, datetime, usage
 - **Best for**: Learning MCP protocol, simple utilities
+- **Includes**: Usage tracking and token accounting utilities
 - **Zero external dependencies**
 
 ### API Template
@@ -157,11 +162,46 @@ export const myTool = {
     },
     required: ["input"]
   },
-  handler: async (args: { input: string }) => {
+  handler: async (args: { input: string }, context?: any) => {
+    // Access JWT, user info via context
+    const userId = context?.user?.sub;
     return { result: `Processed: ${args.input}` };
   }
 };
 ```
+
+## Built-in Features
+
+### Usage Tracking
+
+Every template includes built-in usage tracking for Commands.com marketplace integration:
+
+**What it does:**
+- `usage` tool - Let users check their tier and consumption
+- Token accounting - Track usage for billing/analytics
+- Gateway notifications - Report usage to Commands.com
+
+**When you need it:**
+- ✅ **Deploying to Commands.com marketplace** - Required for the platform's billing and analytics
+- ❌ **Local development** - Not needed, works without any setup
+- ❌ **Self-hosted/private deployments** - Not needed unless you want usage tracking
+
+**Setup (only for Commands.com marketplace):**
+```bash
+# Set your Commands.com organization/username
+npx create-commands-mcp set-org <your-org>
+
+# Example:
+npx create-commands-mcp set-org johndoe
+```
+
+Without this setup, your MCP server works perfectly - only the `usage` tool will return an error.
+
+### Token Accounting
+For long-running operations, use the included utilities:
+- `utils/tokenCounter.ts` - Token counting and job tracking
+- `utils/gatewayNotify.ts` - Gateway notifications for usage reporting
+- See `tools/asyncExample.ts` for implementation example
 
 ## Deployment Options
 

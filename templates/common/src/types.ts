@@ -36,7 +36,7 @@ export interface Tool {
     properties: Record<string, any>;
     required?: string[];
   };
-  handler: (args: any) => Promise<any>;
+  handler: (args: any, context?: any) => Promise<any>;
 }
 
 // JWT Types
