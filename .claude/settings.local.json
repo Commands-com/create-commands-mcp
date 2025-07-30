@@ -20,8 +20,7 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(grep:*)",
-      "Bash(npm publish:*)",
-      "Bash(npm run:*)"
+      "Bash(npm publish:*)"
     ],
     "deny": []
   }

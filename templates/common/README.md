@@ -10,12 +10,9 @@ Created with [create-commands-mcp](https://www.npmjs.com/package/create-commands
 # Install dependencies
 npm install
 
-# Configure environment
+# Configure environment (optional)
 cp .env.example .env
-
-# Set your Commands.com organization (required for usage tracking)
-npx create-commands-mcp set-org <your-commands-org>
-# Example: npx create-commands-mcp set-org johndoe
+# Customize settings if needed - works out of the box!
 
 # Start development server
 npm run dev
@@ -29,7 +26,6 @@ curl http://localhost:3000/health
 - **ping** - Test server connectivity
 - **echo** - Echo back user input  
 - **datetime** - Get current date/time in various formats
-- **usage** - Check your Commands.com usage limits and consumption
 
 ## Development
 
@@ -102,75 +98,6 @@ curl -X POST http://localhost:3000 \
 - ✅ **Error handling** - Return meaningful error messages
 - 📊 **Structured output** - Consistent response format helps AI usage
 - 🚀 **Performance** - Keep tools fast (< 30s timeout recommended)
-
-### Token Accounting & Usage Tracking
-
-**What is this for?** When your MCP server is deployed to Commands.com's marketplace, the platform tracks usage to:
-- Enforce tier-based limits (free/pro/enterprise users)
-- Provide usage analytics to developers
-- Handle billing for premium features
-
-**Do I need this?** 
-- ✅ **For local development**: No, everything works without configuration
-- ✅ **For Commands.com marketplace**: Yes, required for usage tracking and billing
-- ✅ **For self-hosted/private use**: No, you can ignore these features
-
-#### Usage Stats Tool
-The built-in `usage` tool lets users check their Commands.com tier and consumption:
-```bash
-# Via REST API
-curl -X POST http://localhost:3000/mcp/tools/usage \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
-
-Returns:
-- Current tier (free/pro/enterprise)
-- Usage limits based on tier
-- Current consumption (daily/monthly)
-- Remaining quota for free tier users
-
-#### Job-Level Token Accounting
-
-**When to use**: For expensive operations (AI calls, large data processing) where you need to:
-- Track token/resource usage per operation
-- Report usage back to Commands.com for accurate billing
-- Implement usage-based features or limits
-
-**Example use cases**:
-- AI model calls (track tokens used)
-- Data processing jobs (track compute time)
-- External API calls (track request counts)
-
-For long-running operations, use the included utilities:
-
-```typescript
-import { jobStore, countTokens } from './utils/tokenCounter.js';
-import { notifyJobComplete } from './utils/gatewayNotify.js';
-
-// Create a job with token tracking
-const job = await jobStore.create({
-  userId: 'user123',
-  operation: 'data_processing',
-  state: 'pending',
-  input: userInput
-});
-
-// Process and track tokens
-const output = await processData(userInput);
-const completedJob = await jobStore.complete(job.id, output);
-
-// Notify gateway with token usage
-await notifyJobComplete(
-  job.id,
-  jwt,
-  completedJob.tokenCount.total,
-  durationMs
-);
-```
-
-See `src/tools/asyncExample.ts` for a complete implementation example.
 
 ### Documentation & Examples
 

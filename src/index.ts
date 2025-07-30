@@ -24,6 +24,7 @@ interface CreateOptions {
   deploy?: 'railway' | 'vercel' | 'docker' | 'aws';
   author?: string;
   description?: string;
+  org?: string;
 }
 
 interface ProjectConfig {
@@ -36,23 +37,24 @@ interface ProjectConfig {
   template: string;
   language: string;
   deployment: string[];
+  organization: string;
 }
 
 const TEMPLATES = {
   basic: {
     name: 'Basic MCP Server',
-    description: 'Simple server with ping, echo, datetime, and usage tracking',
-    tools: ['ping', 'echo', 'datetime', 'usage']
+    description: 'Simple server with ping, echo, and datetime tools',
+    tools: ['ping', 'echo', 'datetime']
   },
   api: {
     name: 'API Integration Server', 
-    description: 'Server with external API tools, offline fallbacks, and usage tracking',
-    tools: ['ping', 'echo', 'catfact', 'weather', 'usage']
+    description: 'Server with external API tools and offline fallbacks',
+    tools: ['ping', 'echo', 'catfact', 'weather']
   },
   data: {
     name: 'Data Processing Server',
-    description: 'Server with file processing, data transformation, and usage tracking', 
-    tools: ['ping', 'echo', 'jsonparse', 'csvprocess', 'usage']
+    description: 'Server with file processing and data transformation tools', 
+    tools: ['ping', 'echo', 'jsonparse', 'csvprocess']
   }
 } as const;
 
@@ -69,6 +71,7 @@ async function main() {
     .option('-d, --deploy <platform>', 'Deployment platform (railway|vercel|docker|aws)')
     .option('--author <name>', 'Author name')
     .option('--description <desc>', 'Project description')
+    .option('--org <organization>', 'Commands.com organization/username')
     .action(async (name, options) => {
       await createProject(name, options);
     });
@@ -87,14 +90,6 @@ async function main() {
     .description('Show the deployment workflow steps again')
     .action(async () => {
       await showNextSteps();
-    });
-
-  // Set organization command
-  program
-    .command('set-org <organization>')
-    .description('Set your Commands.com organization/username in .env file')
-    .action(async (organization) => {
-      await setOrganization(organization);
     });
 
   await program.parseAsync();
@@ -127,6 +122,22 @@ async function createProject(projectName: string, options: CreateOptions) {
       process.exit(1);
     }
 
+    // If organization not provided via CLI, we need to prompt for it
+    let organization = options.org;
+    if (!organization) {
+      const orgAnswer = await inquirer.prompt([{
+        type: 'input',
+        name: 'organization',
+        message: 'Commands.com organization/username:',
+        validate: (input: string) => {
+          if (!input.trim()) return 'Organization is required for Commands.com integration';
+          if (!/^[a-zA-Z0-9_-]+$/.test(input)) return 'Use alphanumeric characters, hyphens, and underscores only';
+          return true;
+        }
+      }]);
+      organization = orgAnswer.organization;
+    }
+
     config = {
       name: projectName,
       description: options.description || `MCP server created with ${options.template} template`,
@@ -136,7 +147,8 @@ async function createProject(projectName: string, options: CreateOptions) {
       },
       template: options.template,
       language: options.lang,
-      deployment: options.deploy ? [options.deploy] : []
+      deployment: options.deploy ? [options.deploy] : [],
+      organization
     };
   }
 
@@ -176,6 +188,16 @@ async function promptForConfig(initialName?: string): Promise<ProjectConfig> {
       validate: (input: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(input) || 'Please enter a valid email address';
+      }
+    },
+    {
+      type: 'input',
+      name: 'organization',
+      message: 'Commands.com organization/username:',
+      validate: (input: string) => {
+        if (!input.trim()) return 'Organization is required for Commands.com integration';
+        if (!/^[a-zA-Z0-9_-]+$/.test(input)) return 'Use alphanumeric characters, hyphens, and underscores only';
+        return true;
       }
     },
     {
@@ -221,7 +243,8 @@ async function promptForConfig(initialName?: string): Promise<ProjectConfig> {
     },
     template: answers.template,
     language: answers.language,
-    deployment: answers.deployment
+    deployment: answers.deployment,
+    organization: answers.organization
   };
 }
 
@@ -255,14 +278,13 @@ async function executeProjectCreation(config: ProjectConfig) {
     console.log(chalk.white(`   1. cd ${config.name}`));
     console.log(chalk.white('   2. npm install'));
     console.log(chalk.white('   3. cp .env.example .env'));
-    console.log(chalk.white('   4. npx create-commands-mcp set-org <your-commands-org>'));
-    console.log(chalk.white('   5. npm run dev  # Test locally'));
-    console.log(chalk.white('   6. git init && git add . && git commit -m "Initial commit"'));
-    console.log(chalk.white('   7. git remote add origin <your-github-repo-url>'));
-    console.log(chalk.white('   8. git push -u origin main'));
-    console.log(chalk.white('   9. Deploy to Railway/Vercel/AWS (hosts your server)'));
-    console.log(chalk.white('  10. npx create-commands-mcp set-proxy <your-live-url>'));
-    console.log(chalk.white('  11. Update GitHub repo with proxy URL and deploy to Commands.com'));
+    console.log(chalk.white('   4. npm run dev  # Test locally'));
+    console.log(chalk.white('   5. git init && git add . && git commit -m "Initial commit"'));
+    console.log(chalk.white('   6. git remote add origin <your-github-repo-url>'));
+    console.log(chalk.white('   7. git push -u origin main'));
+    console.log(chalk.white('   8. Deploy to Railway/Vercel/AWS (hosts your server)'));
+    console.log(chalk.white('   9. npx create-commands-mcp set-proxy <your-live-url>'));
+    console.log(chalk.white('  10. Update GitHub repo with proxy URL and deploy to Commands.com'));
     console.log(chalk.gray('\n📚 See README.md for detailed deployment instructions'));
     console.log(chalk.gray('💡 Run "npx create-commands-mcp next-steps" to see these steps again'));
     
@@ -314,7 +336,8 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
     author: {
       name: escapeTemplateValue(config.author.name),
       email: escapeTemplateValue(config.author.email)
-    }
+    },
+    organization: escapeTemplateValue(config.organization)
   };
 
   // Update package.json
@@ -363,6 +386,15 @@ async function updateProjectFiles(config: ProjectConfig, targetPath: string) {
       .replace(/{{author_name}}/g, safeConfig.author.name)
       .replace(/{{author_email}}/g, safeConfig.author.email);
     await fs.writeFile(mcpYamlPath, mcpYaml);
+  }
+
+  // Update src/config.ts
+  const configPath = path.join(targetPath, 'src', 'config.ts');
+  if (await fs.pathExists(configPath)) {
+    let configFile = await fs.readFile(configPath, 'utf-8');
+    configFile = configFile
+      .replace(/{{organization}}/g, safeConfig.organization);
+    await fs.writeFile(configPath, configFile);
   }
 
   // Update command-docs/command.md
@@ -444,14 +476,13 @@ async function showNextSteps() {
     console.log(chalk.white(`   1. cd ${projectName}`));
     console.log(chalk.white('   2. npm install'));
     console.log(chalk.white('   3. cp .env.example .env'));
-    console.log(chalk.white('   4. npx create-commands-mcp set-org <your-commands-org>'));
-    console.log(chalk.white('   5. npm run dev  # Test locally'));
-    console.log(chalk.white('   6. git init && git add . && git commit -m "Initial commit"'));
-    console.log(chalk.white('   7. git remote add origin <your-github-repo-url>'));
-    console.log(chalk.white('   8. git push -u origin main'));
-    console.log(chalk.white('   9. Deploy to Railway/Vercel/AWS (hosts your server)'));
-    console.log(chalk.white('  10. npx create-commands-mcp set-proxy <your-live-url>'));
-    console.log(chalk.white('  11. Update GitHub repo with proxy URL and deploy to Commands.com'));
+    console.log(chalk.white('   4. npm run dev  # Test locally'));
+    console.log(chalk.white('   5. git init && git add . && git commit -m "Initial commit"'));
+    console.log(chalk.white('   6. git remote add origin <your-github-repo-url>'));
+    console.log(chalk.white('   7. git push -u origin main'));
+    console.log(chalk.white('   8. Deploy to Railway/Vercel/AWS (hosts your server)'));
+    console.log(chalk.white('   9. npx create-commands-mcp set-proxy <your-live-url>'));
+    console.log(chalk.white('  10. Update GitHub repo with proxy URL and deploy to Commands.com'));
     
     // Check if proxy URL has been set
     if (await fs.pathExists(mcpYamlPath)) {
@@ -466,74 +497,6 @@ async function showNextSteps() {
     
   } catch (error) {
     console.error(chalk.red('❌ Error reading project information'));
-    process.exit(1);
-  }
-}
-
-async function setOrganization(organization: string) {
-  try {
-    // Validate organization name
-    if (!organization || !organization.trim()) {
-      console.error(chalk.red('❌ Organization name is required'));
-      process.exit(1);
-    }
-    
-    // Sanitize organization name (alphanumeric, hyphens, underscores)
-    if (!/^[a-zA-Z0-9_-]+$/.test(organization)) {
-      console.error(chalk.red('❌ Invalid organization name'));
-      console.error(chalk.gray('Use alphanumeric characters, hyphens, and underscores only'));
-      process.exit(1);
-    }
-    
-    // Check if .env file exists in current directory
-    const envPath = path.join(process.cwd(), '.env');
-    const envExamplePath = path.join(process.cwd(), '.env.example');
-    
-    let envContent = '';
-    
-    // If .env doesn't exist, create from .env.example
-    if (!await fs.pathExists(envPath)) {
-      if (await fs.pathExists(envExamplePath)) {
-        console.log(chalk.cyan('📝 Creating .env from .env.example...'));
-        envContent = await fs.readFile(envExamplePath, 'utf-8');
-      } else {
-        console.log(chalk.cyan('📝 Creating new .env file...'));
-        envContent = '';
-      }
-    } else {
-      // Read existing .env
-      envContent = await fs.readFile(envPath, 'utf-8');
-    }
-    
-    // Update or add COMMANDS_ORG
-    const orgRegex = /^COMMANDS_ORG=.*$/m;
-    if (orgRegex.test(envContent)) {
-      // Update existing
-      envContent = envContent.replace(orgRegex, `COMMANDS_ORG=${organization}`);
-    } else {
-      // Add new (after COMMANDS_JWKS_URL if present, otherwise at the beginning)
-      const jwksMatch = envContent.match(/^COMMANDS_JWKS_URL=.*$/m);
-      if (jwksMatch) {
-        const insertIndex = jwksMatch.index! + jwksMatch[0].length;
-        envContent = envContent.slice(0, insertIndex) + 
-          '\n\n# Commands.com Organization\nCOMMANDS_ORG=' + organization +
-          envContent.slice(insertIndex);
-      } else {
-        // Add at the beginning
-        envContent = `# Commands.com Organization\nCOMMANDS_ORG=${organization}\n\n${envContent}`;
-      }
-    }
-    
-    // Write updated .env
-    await fs.writeFile(envPath, envContent);
-    
-    console.log(chalk.green.bold('✅ Organization set successfully!'));
-    console.log(chalk.cyan(`📋 COMMANDS_ORG=${organization}`));
-    console.log(chalk.gray('\n🔧 The usage tracking tools will now use this organization'));
-    console.log(chalk.gray('💡 Make sure this matches your Commands.com username/organization'));
-    
-  } catch (error) {
-    console.error(chalk.red('❌ Error setting organization:'), error);
     process.exit(1);
   }
 }

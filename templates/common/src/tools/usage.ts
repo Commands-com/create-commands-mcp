@@ -1,6 +1,5 @@
 import { Tool } from '../types.js';
-
-const GATEWAY_URL = process.env.GATEWAY_URL || 'https://api.commands.com';
+import { COMMANDS_CONFIG } from '../config.js';
 
 /**
  * Usage stats tool for Commands.com gateway integration
@@ -23,16 +22,9 @@ export const usageTool: Tool = {
     }
     
     try {
-      // Extract organization and server name from environment
-      const organization = process.env.COMMANDS_ORG;
+      // Get organization from config and server name from environment
+      const organization = COMMANDS_CONFIG.organization;
       const serverName = process.env.npm_package_name || process.env.MCP_NAME;
-      
-      if (!organization) {
-        return {
-          error: 'Configuration required',
-          message: 'COMMANDS_ORG environment variable not set. Run: npx create-commands-mcp set-org <your-org>'
-        };
-      }
       
       if (!serverName) {
         return {
@@ -43,7 +35,7 @@ export const usageTool: Tool = {
       
       // Call the gateway's usage stats endpoint
       // Format: /api/{organization}/{mcp-name}/usage-stats
-      const response = await fetch(`${GATEWAY_URL}/api/${organization}/${serverName}/usage-stats`, {
+      const response = await fetch(`${COMMANDS_CONFIG.gatewayUrl}/api/${organization}/${serverName}/usage-stats`, {
         headers: {
           'Authorization': context.jwt
         }

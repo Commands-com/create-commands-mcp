@@ -5,7 +5,8 @@
  * about job completions and token usage for accurate billing and tracking.
  */
 
-const GATEWAY_URL = process.env.GATEWAY_URL || 'https://api.commands.com';
+import { COMMANDS_CONFIG } from '../config.js';
+
 const GATEWAY_TIMEOUT = 30000; // 30 seconds
 
 export interface GatewayNotification {
@@ -34,17 +35,17 @@ export async function notifyGateway(
     return;
   }
   
-  // Extract organization and server name
-  const organization = process.env.COMMANDS_ORG;
+  // Get organization from config and server name from environment
+  const organization = COMMANDS_CONFIG.organization;
   const serverName = process.env.npm_package_name || process.env.MCP_NAME;
   
-  if (!organization || !serverName) {
-    console.error('[gateway] Missing configuration: COMMANDS_ORG or server name not set');
+  if (!serverName) {
+    console.error('[gateway] Missing configuration: server name not set');
     return;
   }
   
   // Construct the callback URL
-  const endpoint = `${GATEWAY_URL}/api/${organization}/${serverName}/job-status`;
+  const endpoint = `${COMMANDS_CONFIG.gatewayUrl}/api/${organization}/${serverName}/job-status`;
   
   try {
     console.log(`[gateway] Notifying gateway for job ${jobId} with status: ${notification.status}`);
