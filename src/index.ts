@@ -148,7 +148,7 @@ async function createProject(projectName: string, options: CreateOptions) {
       template: options.template,
       language: options.lang,
       deployment: options.deploy ? [options.deploy] : [],
-      organization
+      organization: organization!
     };
   }
 

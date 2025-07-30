@@ -7,16 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Security hardening: Path traversal protection and template injection prevention
-- Concurrent filesystem operations for better performance
-- Telemetry toggle option (`--no-telemetry`)
-- npm audit script for security vulnerability checking
-- Enhanced prepublishOnly script with template validation
+## [1.5.1] - 2025-07-30
+
+### Fixed
+- Reverted universal context parameter requirement from v1.5.0
+- Tool handlers now only receive context when needed (usage, async tools)
+- Organization is now embedded in code during project creation instead of environment variable
+- SKIP_AUTH defaults to true for easier local development
 
 ### Changed
-- TypeScript compilation now outputs readable ES modules instead of minified code
-- Pinned inquirer to v9.x to prevent breaking changes from v10
+- Replaced `set-org` command with organization prompt during project creation
+- Organization configuration moved from .env to src/config.ts for automatic deployment
+
+### Removed
+- Removed COMMANDS_ORG environment variable requirement
 
 ## [1.0.10] - 2025-07-02
 
