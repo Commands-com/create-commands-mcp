@@ -123,6 +123,91 @@ Commands.com handles all payment processing:
 - No Stripe integration needed in your server
 - Automatic user access control
 
+## Handling Long Operations with SSE
+
+### Working Implementation
+
+For operations that take more than 5 seconds, use SSE to prevent gateway timeouts:
+
+```javascript
+case 'stream_demo':
+  const { steps = 5, delay_ms = 500 } = toolArgs || {};
+
+  if (acceptsSSE && method === 'tools/call') {
+    // Set streaming headers for SSE
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+
+    // Process all steps and send SSE events
+    (async () => {
+      const messages: string[] = [];
+
+      for (let i = 1; i <= steps; i++) {
+        // Simulate some work
+        await new Promise(resolve => setTimeout(resolve, delay_ms));
+
+        // Add progress message
+        const message = `Step ${i}/${steps}: ${i === steps ? 'Complete!' : 'Processing...'}`;
+        messages.push(message);
+
+        // Send complete response as SSE event (gateway handles incremental updates)
+        const response = {
+          jsonrpc: '2.0',
+          result: {
+            content: [{
+              type: 'text',
+              text: messages.join('\n')
+            }]
+          },
+          id
+        };
+
+        res.write(`data: ${JSON.stringify(response)}\n\n`);
+      }
+
+      // End the SSE stream
+      res.end();
+    })();
+
+    return; // Early return for async streaming
+  } else {
+    // Non-streaming fallback
+    const messages = [];
+    for (let i = 1; i <= steps; i++) {
+      messages.push(`Step ${i}/${steps}: ${i === steps ? 'Complete!' : 'Processed'}`);
+    }
+
+    return res.json({
+      jsonrpc: '2.0',
+      result: {
+        content: [{
+          type: 'text',
+          text: messages.join('\n')
+        }]
+      },
+      id
+    });
+  }
+```
+
+### Key Implementation Points
+
+1. **Check for SSE support**: `acceptsSSE && method === 'tools/call'`
+2. **Set proper headers**: Content-Type must be `text/event-stream`
+3. **Send periodic updates**: Every 500ms to 5s to prevent timeouts
+4. **Cumulative responses**: Each update contains all progress so far
+5. **Proper cleanup**: Always call `res.end()` when done
+6. **Fallback support**: Handle non-SSE clients gracefully
+
+### When to Use This Pattern
+
+- Operations that take > 5 seconds
+- API calls with unpredictable response times
+- Multi-step processes with clear progress points
+- Data processing with incremental results
+
 ## Common Commands
 
 ### Linting and Type Checking

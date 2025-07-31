@@ -221,23 +221,60 @@ Commands.com provides a complete business platform for just **15% revenue share*
 
 ## Server-Sent Events (SSE) Support
 
-The generated MCP servers include built-in SSE support for compatibility with modern gateways like Commands.com API Gateway. This enables:
+The generated MCP servers include built-in SSE support for preventing gateway timeouts on long-running operations.
 
-- **Real-time streaming** - Progressive responses for long-running operations
-- **Automatic fallback** - Works with both SSE-enabled and standard HTTP clients
-- **Gateway compatibility** - Seamless integration with proxy servers
-- **No configuration needed** - SSE is automatically enabled when client sends `Accept: text/event-stream`
+### When to Use SSE
 
-### How it works:
+Use SSE for any operation that takes **more than 5 seconds** to prevent gateway timeouts. Here's a working example:
+
 ```javascript
-// Your MCP server automatically detects SSE support
-// When a client accepts text/event-stream:
-if (req.headers.accept?.includes('text/event-stream')) {
-  // Response is automatically streamed as SSE
-  return sendStreamingResponse(res, result, id);
-}
-// Otherwise, standard JSON response is used
+case 'long_operation':
+  const { steps = 5, delay_ms = 1000 } = toolArgs || {};
+
+  if (acceptsSSE && method === 'tools/call') {
+    // Set SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    // Process with periodic updates
+    (async () => {
+      const messages: string[] = [];
+
+      for (let i = 1; i <= steps; i++) {
+        // Do work
+        await processStep(i);
+        
+        // Add progress
+        messages.push(`Step ${i}/${steps}: ${i === steps ? 'Complete!' : 'Processing...'}`);
+
+        // Send cumulative response
+        const response = {
+          jsonrpc: '2.0',
+          result: {
+            content: [{
+              type: 'text',
+              text: messages.join('\n')
+            }]
+          },
+          id
+        };
+        res.write(`data: ${JSON.stringify(response)}\n\n`);
+      }
+      res.end();
+    })();
+    return;
+  }
+  
+  // Fallback for non-SSE clients
+  return standardResponse();
 ```
+
+### Key Points:
+- **Send updates every 1-5 seconds** to prevent timeouts
+- **Each update contains the complete response** (cumulative)
+- **Always provide a non-SSE fallback**
+- **Gateway compatibility** - Works with Commands.com and other proxies
 
 ### Supported methods:
 - `tools/list`, `tools/call` - Tool discovery and execution

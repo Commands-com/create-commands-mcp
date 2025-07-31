@@ -98,6 +98,7 @@ curl -X POST http://localhost:3000 \
 - ✅ **Error handling** - Return meaningful error messages
 - 📊 **Structured output** - Consistent response format helps AI usage
 - 🚀 **Performance** - Keep tools fast (< 30s timeout recommended)
+- ⏱️ **Long Operations** - Use SSE for operations > 5 seconds (see example below)
 
 ### Documentation & Examples
 
@@ -227,6 +228,60 @@ Commands.com provides a complete business platform for just **15% revenue share*
 - ✅ Proper JWT authentication
 - ✅ Health check endpoint working
 - ✅ Rate limiting respected
+
+## Handling Long Operations (SSE)
+
+For operations that take **more than 5 seconds**, use Server-Sent Events to prevent gateway timeouts:
+
+```javascript
+// In your tools/call handler:
+case 'long_operation':
+  const { steps = 5, delay_ms = 1000 } = toolArgs || {};
+
+  if (acceptsSSE && method === 'tools/call') {
+    // Set SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    // Process asynchronously with updates
+    (async () => {
+      const messages: string[] = [];
+
+      for (let i = 1; i <= steps; i++) {
+        // Do actual work here
+        await doWork(i);
+        
+        // Build cumulative response
+        messages.push(`Step ${i}/${steps} complete`);
+
+        // Send update
+        const response = {
+          jsonrpc: '2.0',
+          result: {
+            content: [{
+              type: 'text',
+              text: messages.join('\n')
+            }]
+          },
+          id
+        };
+        res.write(`data: ${JSON.stringify(response)}\n\n`);
+      }
+      res.end();
+    })();
+    return; // Early return
+  }
+  
+  // Non-SSE fallback
+  return standardResponse();
+```
+
+### Key Points:
+- ✅ Send updates every 1-5 seconds
+- ✅ Each update contains complete response (cumulative)
+- ✅ Always provide non-SSE fallback
+- ✅ Call `res.end()` when complete
 
 ## Architecture
 
